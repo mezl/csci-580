@@ -1,56 +1,121 @@
-var HIT = 1;
-var MISS = 0;
-var INPRIM = -1;
+// -----------------------------------------------------------
+// scene.js
+// 2012 Spring CS580 Final Project 4/18/2012
+// Author: Yun-Yu Chen,Sophia Chang,Vince Liao,Chin-Kai Chang
+// -----------------------------------------------------------
 
+//#############################################################################
+// Intersection method return values
+var HIT = 1;		// Ray hit primitive
+var MISS = 0;		// Ray missed primitive
+var INPRIM = -1;	// Ray started inside primitive
+
+//#############################################################################
 // class Material
 function Material()
 {
-	this.m_color = new color(0.2, 0.2, 0.2); //?
+	// default constructor
+	this.m_color = new Color(0.2, 0.2, 0.2); //?
 	this.m_Refl = 0;
 	this.m_Diff = 0.2;
+	
+	// @param {Color} a_color
 	this.SetColor = function(a_color) { this.m_color = a_color; }
+	
+	// @return {Color} color of this material
 	this.GetColor = function() { return this.m_color; }
+	
+	// @param {float} a_Diff
 	this.SetDiffuse = function(a_Diff) { this.m_Diff = a_Diff; }
+	
+	// @param {float} a_Refl
 	this.SetReflection = function(a_Refl) { this.m_Refl = a_Refl; }
+
+	// @return {float} specular of this material
 	this.GetSpecular = function() { return 1.0 - this.m_Diff; }
+	
+	// @return {float} diffuse of this material
 	this.GetDiffuse = function() { return this.m_Diff; }
+	
+	// @return {float} reflection of this material
 	this.GetReflection = function () { return this.m_Refl; }
 }
 
-//class Primitive
+//#############################################################################
+// class Primitive
+
 var SPHERE = 1; //enum ??
 var PLANE = 2;
 
 function Primitive()
 {
+	// default constructor
 	this.m_Name = 0;
 	this.m_Light = new Boolean(false);
+
+	// @return {Material} material of this primitive
 	this.GetMaterial = function() { return this.m_Material; }
+
+	// @param {Material} a_Mat
 	this.SetMaterial = function(a_Mat) { this.m_Material = a_Mat; }
+
+	// @return {int} type of this primitive
 	this.GetType  = function() { return 0; }
+	
+	// @param {Ray} a_Ray
+	// @param {float} a_Dist
+	// @return {int} intersection type
 	this.Intersect = function(a_Ray, a_Dist) { return 0; }
+
+	// @param {vector3} a_Pos
+	// @return {vector3} normal of the primitive
 	this.GetNormal = function(a_Pos) { return 0; }
+	
+	// @return {Color} color of this material
 	this.GetColor = function() { return this.m_Material.GetColor(); }
+
+	// @param {Boolean} a_Light
 	this.Light = function(a_Light) { this.m_Light = a_Light; }
+	
+	// @return {Boolean} is this primitive a light
 	this.IsLight = function() { return this.m_Light.valueOf(); }
+	
+	// @param {string} a_Name
 	this.SetName = function(a_Name) { this.m_Name = a_Name; }
+	
+	// @return {string} name of this primitive
 	this.GetName = function() { return this.m_Name; }
 
 }
-//class Sphere
+
+//#############################################################################
+// class Sphere
+// @param {vector3} a_Centre
+// @param {float} a_Radius
 function Sphere(a_Centre, a_Radius)
 {
+	// @return {int} type of this primitive
 	this.GetType = function() { return SPHERE; }
+	
+	// constructor
 	this.m_Centre = a_Centre;
 	this.m_SqRadius = a_Radius * a_Radius;
 	this.m_Radius = a_Radius;
 	this.m_RRadius = 1.0 / a_Radius;
-	this.GetCertre = function() { reuturn this.m_Centre; }
+	
+	// @return {vertor3} centre of this sphere
+	this.GetCertre = function() { return this.m_Centre; }
+	
+	// @return {float} radius of this sphere
 	this.GetSqRadius = function() { return this.m_SqRadius; }
+	
+	// @param {Ray} a_Ray
+	// @param {float} a_Dist
+	// @return {int} intersection type
 	this.Intersect = function(a_Ray, a_Dist) {
 		var v = a_Ray.GetOrigin().Sub(this.m_Centre);
-		var b = - v.Dot(a_Ray.GetDirection());
-		var det = (b * b) - v.Dot(v) + this.m_SqRadius;
+		var b = - DOT(v, a_Ray.GetDirection());
+		var det = (b * b) - DOT(v, v) + this.m_SqRadius;
 		var retval = MISS;
 		if(det > 0)
 		{
@@ -79,22 +144,40 @@ function Sphere(a_Centre, a_Radius)
 		}
 		return retval;
 	}
+	
+	// @param {vector3} a_Pos
+	// @return {vector3} normal
 	this.GetNormal = function(a_Pos) {return (a_Pos.Sub(this.m_Centre)).Mul(this.m_RRadius); }
 }
+// set parent
 Sphere.prototype = new Primitive();
 
-//class PlanePrim
+//#############################################################################
+// class PlanePrim
+// @param {vector3} a_Normal
+// @param {float} a_D
 function PlanePrim(a_Normal, a_D)
 {
+	// @return {int} type of this primitive
 	this.GetType = function() { return PLANE; }
+	
+	//constructor
 	this.m_Plane = new plane(a_Normal, a_D);
+	
+	// @return {vector3} normal of this planeprim
 	this.GetNormal = function() { return this.m_Plane.N; }
+	
+	// @return {float} d of this planeprim
 	this.GetD = function() { return this.m_Plane.D; }
+	
+	// @param {Ray} a_Ray
+	// @param {float} a_Dist
+	// @return {int} intersection type
 	this.Intersect = function(a_Ray, a_Dist) {
 		var d = this.m_Plane.N.Dot(a_Ray.GetDirection());
 		if(d != 0)
 		{
-			var dist = - (this.m_Plane.N.Dot(a_Ray.GetOrigin()) + this.m_Plane.D) / d;
+			var dist = - (DOT(this.m_Plane.N, a_Ray.GetOrigin()) + this.m_Plane.D) / d;
 			if( dist > 0 )
 			{
 				if( dist < a_Dist)
@@ -106,15 +189,22 @@ function PlanePrim(a_Normal, a_D)
 		}
 		return MISS;
 	}
+	
+	// @param {vector3} a_Pos
+	// @return {vector3} normal
 	this.GetNormal = function(a_Pos) { return this.m_Plane.N; }
 }
 PlanePrim.prototype = new Primitive();
 
+//#############################################################################
 //class Scene
 function Scene()
 {
+	// default constructor
 	this.m_Primitives = 0;
 	this.m_Primtive = 0;
+	
+	// init scene
 	this.InitScene() = function() {
 		this.m_Primitive = new Array(100);
 		// ground plane
@@ -145,6 +235,10 @@ function Scene()
 		
 		this.m_Primitives = 5;
 	}
+	
+	// @return {float} number of primitives in this scene
 	this.GetNrPrimitives = function() { return this.m_Primitives; }
+	
+	// @return {Array} array containing all the primitives in this scene
 	this.GetPrimitive = function(a_Idx) { return this.m_Primitive[a_Idx]; }
 }
