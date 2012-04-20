@@ -525,8 +525,6 @@ function Engine()
 				{
 					//@param {Primitive}
 					var light = p;
-          console.log("light is "+light.toString());
-          console.log("pi "+pi.toString());
 					//@param {vector3}
 					var L = light.GetCentre().Sub(pi);
 					L.Normalize();
@@ -541,7 +539,7 @@ function Engine()
 							//@param {float}
 							var diff = dot * prim.GetMaterial().GetDiffuse();
 							// add diffuse component to ray color
-							a_Acc = a_ACC.Add( diff.Mul( prim.GetMaterial().GetColor().Mul(light.GetMaterial().GetColor()))); 
+							a_Acc = a_Acc.Add( ( prim.GetMaterial().GetColor().Mul(light.GetMaterial().GetColor())).Mul(diff)); 
 						}
 					}
 				}
