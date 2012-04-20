@@ -4,7 +4,7 @@
 // Author: Yun-Yu Chen,Sophia Chang,Vince Liao,Chin-Kai Chang
 // -----------------------------------------------------------
 
-//testScene();
+testScene();
 //#############################################################################
 // test
 function testScene()
