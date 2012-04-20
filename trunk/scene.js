@@ -11,7 +11,7 @@ function testScene()
 {
 	var mat = new Material();
 	console.log("Test Material Default: " + mat.toString());
-	console.log("Test Material Default Color: " + mat.GetColor().toString());
+	console.log("Test Material Default Color: " + mat.GetColor().toString);
 	console.log("Test Material Default Refl: " + mat.GetReflection().toString());
 	console.log("Test Material Default Diff: " + mat.GetDiffuse().toString());
 	console.log("Test Material Default Spec: " + mat.GetSpecular().toString());
@@ -19,7 +19,7 @@ function testScene()
 	mat.SetDiffuse(0.5);
 	mat.SetReflection(0.2);
 	console.log("Test Material: " + mat.toString());
-	console.log("Test Material Set Color: " + mat.GetColor().toString());
+	console.log("Test Material Set Color: " + mat.GetColor().toString);
 	console.log("Test Material Set Refl: " + mat.GetReflection().toString());
 	console.log("Test Material Set Diff: " + mat.GetDiffuse().toString());
 	console.log("Test Material Set Spec: " + mat.GetSpecular().toString());
@@ -108,7 +108,7 @@ function Material()
 	
 	// @return {String}
 	this.toString = function() { 
-		return "[ Material Color: " + this.m_color.toString() +" Refl: " + this.m_Refl 
+		return "[ Material Color: " + this.m_color.toString +" Refl: " + this.m_Refl 
 		+ " Diff: " + this.m_Diff + " Spec: " + this.GetSpecular() + " ]"; 
 	}
 }
