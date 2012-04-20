@@ -490,10 +490,12 @@ function Engine()
 		{
 			//@param {Primitive}
 			var pr = this.m_Scene.GetPrimitive( s );
+      //console.log("pr is "+pr.toString());
+      //console.log("ray is "+a_Ray.m_Origin.toString()+"  Dir:"+a_Ray.m_Direction.toString());
 			//@param {int}
 			var res;
       var prReturn = pr.Intersect(a_Ray);
-			if(prReturn[0])
+			if(prReturn[0] != 0)
 			{
         a_Dist = prReturn[1];
         ret[2] = a_Dist;
@@ -501,9 +503,9 @@ function Engine()
 				prim = pr;
 				result = res; 
 			}
-      console.log("ray"+a_Ray.toString()+" dist "+a_Dist);
 		}
 
+    //console.log("prim is "+prim);
 		if (!prim) {ret[0]=0;return ret;};
 
 		if (prim.IsLight())
@@ -587,10 +589,12 @@ function Engine()
 				//@param {Color}
 				var acc = new Color( 0, 0, 0 );
 				//@param {vector3}
-				var dir = vector3( this.m_SX, this.m_SY, 0 ) - o;
-				NORMALIZE( dir );
+				var dir = new vector3( this.m_SX, this.m_SY, 0 ).Sub(o);
+				var nDir = NORMALIZE( dir );
 				//@param {Ray}
-				var r = new Ray( o, dir );
+				var r = new Ray( o, nDir );
+        
+        console.log("Ray DIR "+r.m_Direction.toString()+" nDir"+nDir.toString()+" dir"+dir.toString());
 				//@param {float}
 				var dist;
 				//@param {Primitive}
