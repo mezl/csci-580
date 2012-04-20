@@ -194,7 +194,8 @@ function Engine()
 		//@param {vector3}
 		var o = new vector3( 0, 0, -5 );
 		//@param {int}
-		var msecs = new GetTickCount();
+		var date = new Date();
+		var msecs = date.getTime();//new GetTickCount();
 		//@param {Primitive}
 		var lastprim = 0;
 		// render remaining lines
@@ -214,7 +215,7 @@ function Engine()
 				//@param {float}
 				var dist;
 				//@param {Primitive}
-				var prim = Raytrace( r, acc, 1, 1.0, dist );
+				var prim = this.Raytrace( r, acc, 1, 1.0, dist );
 				//@param {int}
 				var red = acc.r * 256;
 				var green = acc.g * 256;
@@ -232,7 +233,7 @@ function Engine()
 			}
 			this.m_SY += this.m_DY;
 			// see if we've been working to long already
-			if ((GetTickCount() - msecs) > 100) 
+			if ((/*GetTickCount()*/date.getTime() - msecs) > 100) 
 			{
 				// return control to windows so the screen gets updated
 				this.m_CurrLine = y + 1;
