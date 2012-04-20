@@ -46,7 +46,7 @@ function Engine()
 	//default constructor
 	this.m_Scene = new Scene();
 
-	this.~Engine() = function(){ delete this.m_Scene;};
+	this.~Engine = function(){ delete this.m_Scene;};
 	
 	//@param {Pixel} a_Dest
 	//@param {int} a_Width a_Height
