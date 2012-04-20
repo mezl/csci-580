@@ -44,7 +44,7 @@ function testRaytraceScene(imageData)
 	var dir = new vector3(10, 20, 0);
 	var acc = new Color(0, 0, 0);
 	var a_Ray = ( o, dir);
-	C.Raytrace( a_Ray, acc, 10, 1.0, 2.0);
+	var ret = C.Raytrace( a_Ray,10, 1.0);
 	console.log("Test Engine C.Raytrace: ");
 	var D = C.GetScene();
 	console.log("Test Engine C.GetScene = D: ");
@@ -479,7 +479,7 @@ function Engine()
 		if(a_Depth > TRACEDEPTH) {ret[0] = 0;return ret;}
 
     a_Depth = 1000000.0;
-    var a_Dists
+    var a_Dist = 0;
     //@param  {vector3}
     var pi;
     //@param {Primitive}
@@ -492,7 +492,6 @@ function Engine()
 			var pr = this.m_Scene.GetPrimitive( s );
 			//@param {int}
 			var res;
-      console.log("ray"+a_Ray.toString()+" dist "+a_Dist);
       var prReturn = pr.Intersect(a_Ray);
 			if(prReturn[0])
 			{
@@ -502,6 +501,7 @@ function Engine()
 				prim = pr;
 				result = res; 
 			}
+      console.log("ray"+a_Ray.toString()+" dist "+a_Dist);
 		}
 
 		if (!prim) {ret[0]=0;return ret;};
@@ -585,7 +585,7 @@ function Engine()
 			for ( var x = 0; x < this.m_Width; x++ )
 			{
 				//@param {Color}
-				var acc = new vector3( 0, 0, 0 );
+				var acc = new Color( 0, 0, 0 );
 				//@param {vector3}
 				var dir = vector3( this.m_SX, this.m_SY, 0 ) - o;
 				NORMALIZE( dir );
@@ -594,7 +594,10 @@ function Engine()
 				//@param {float}
 				var dist;
 				//@param {Primitive}
-				var prim = this.Raytrace( r, acc, 1, 1.0, dist );
+				var ret = this.Raytrace( r, 1, 1.0 );
+        prim = ret[0];
+        acc = ret[1];
+        dist = ret[2];
 				//@param {int}
 				var red = acc.r * 256;
 				var green = acc.g * 256;
