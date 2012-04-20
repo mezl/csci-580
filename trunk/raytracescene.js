@@ -3,11 +3,11 @@
 // 2012 Spring CS580 Final Project 4/18/2012
 // Author: Yun-Yu Chen,Sophia Chang,Vince Liao,Chin-Kai Chang
 // -----------------------------------------------------------
-testCommon();
+testRaytraceScene();
 //
 //#############################################################################
 //code testing
-function testCommon()
+function testRaytraceScene(imageData)
 {
 	console.log("Test raytracer.js");
 	//var A = new vector3(1,1,1);
@@ -50,7 +50,7 @@ function testCommon()
 	console.log("Test Engine C.GetScene = D: ");
 	C.InitRender( );
 	console.log("Test Engine C.InitRender: ");
-	C.Render();
+	C.Render(imageData);
 	console.log("Test Engine C.Render: ");//*/
 }
 //#############################################################################
@@ -311,6 +311,7 @@ function Scene()
 		this.m_Primitive = new Array(100);
 		// ground plane
 		this.m_Primitive[0] = new PlanePrim(new vector3(0, 1, 0), 4.4);
+		this.m_Primitive[0].prototype = new Primitive();
 		this.m_Primitive[0].SetName("plane");
 		this.m_Primitive[0].GetMaterial().SetReflection(0);
 		this.m_Primitive[0].GetMaterial().SetDiffuse(1);
@@ -391,6 +392,7 @@ function Engine()
 {
 	//default constructor
 	this.m_Scene = new Scene();
+  this.m_Scene.InitScene();
 
 	//@param {Pixel} a_Dest
 	//@param {int} a_Width a_Height
@@ -499,7 +501,7 @@ function Engine()
 		// render remaining lines
 		for ( var y = this.m_CurrLine; y < (this.m_Height - 20); y++ )
 		{
-			m_SX = m_WX1;
+			this.m_SX = this.m_WX1;
 			// render pixels for current line
 			for ( var x = 0; x < this.m_Width; x++ )
 			{
@@ -548,5 +550,17 @@ function Engine()
 	var m_Width, m_Height, m_CurrLine, m_PPos;
 	//@param {Primitive}
 	var m_LastRow;
+}
+
+//#############################################################################
+// @param {image} imageData
+// @param {int} x,y
+// @return {Color} col
+function setPixel(imageData, x, y, col) {
+	index = (x + y * imageData.width) * 4;
+	imageData.data[index+0] = col.r;
+	imageData.data[index+1] = col.g;
+	imageData.data[index+2] = col.b;
+	imageData.data[index+3] = col.a;	
 }
 
