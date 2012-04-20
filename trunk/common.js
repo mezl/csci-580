@@ -6,6 +6,13 @@
 
 //typedef unsigned int Pixel;no need type in js
 //typedef vector3 Color;
+function Color(r,g,b)
+{
+	this.r = r;
+	this.g = g;
+	this.b = b;
+	this.toArray = new Array(r,g,b);
+}
 
 //testCommon();//All test passed
 //#############################################################################
