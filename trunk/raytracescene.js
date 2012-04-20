@@ -3,7 +3,7 @@
 // 2012 Spring CS580 Final Project 4/18/2012
 // Author: Yun-Yu Chen,Sophia Chang,Vince Liao,Chin-Kai Chang
 // -----------------------------------------------------------
-testRaytraceScene();
+//testRaytraceScene();
 //
 //#############################################################################
 //code testing
@@ -307,7 +307,10 @@ function Scene()
 	this.m_Primtive = 0;
 	
 	// init scene
-	this.InitScene = function() {
+	this.InitScene = function () {
+	    Sphere.prototype = new Primitive(); // set parent
+	    PlanePrim.prototype = new Primitive(); // set parent
+
 		this.m_Primitive = new Array(100);
 		// ground plane
 		this.m_Primitive[0] = new PlanePrim(new vector3(0, 1, 0), 4.4);
