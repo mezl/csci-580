@@ -115,7 +115,7 @@ function Primitive()
 	// @param {Ray} a_Ray
 	// @param {float} a_Dist
 	// @return {int} intersection type
-	this.Intersect = function(a_Ray, a_Dist) { return 0; }
+	this.Intersect = function(a_Ray) { return 0; }
 
 	// @param {vector3} a_Pos
 	// @return {vector3} normal of the primitive
@@ -191,6 +191,38 @@ function Sphere(a_Centre, a_Radius)
 	// @param {Ray} a_Ray
 	// @param {float} a_Dist
 	// @return {int} intersection type
+	this.Intersect = function (a_Ray) {
+	    var result = new Array(2);
+	    var a_Dist = 0;
+	    var v = a_Ray.GetOrigin().Sub(this.m_Centre);
+	    var b = -DOT(v, a_Ray.GetDirection());
+	    var det = (b * b) - DOT(v, v) + this.m_SqRadius;
+	    var retval = MISS;
+	    if (det > 0) {
+	        det = Math.sqrt(det);
+	        var i1 = b - det;
+	        var i2 = b + det;
+	        if (i2 > 0) {
+	            if (i1 < 0) {
+	                if (i2 < a_Dist) {
+	                    a_Dist = i2;
+	                    retval = INPRIM;
+	                }
+	            }
+	            else {
+	                if (i1 < a_Dist) {
+	                    a_Dist = i1;
+	                    retval = HIT;
+	                }
+	            }
+	        }
+	    }
+	    result[0] = retval;
+	    result[1] = a_Dist;
+
+	    return result;
+	}
+    /*
 	this.Intersect = function(a_Ray, a_Dist) {
 		//console.log(a_Ray.GetOrigin() + " " + this.m_Centre);
 		var v = a_Ray.GetOrigin().Sub(this.m_Centre);
@@ -227,7 +259,7 @@ function Sphere(a_Centre, a_Radius)
 		}
 		return retval;
 	}
-	
+	*/
 	// @param {vector3} a_Pos
 	// @return {vector3} normal
 	this.GetNormal = function(a_Pos) {return (a_Pos.Sub(this.m_Centre)).Mul(this.m_RRadius); }
@@ -271,6 +303,29 @@ function PlanePrim(a_Normal, a_D)
 	// @param {Ray} a_Ray
 	// @param {float} a_Dist
 	// @return {int} intersection type
+	this.Intersect = function (a_Ray) {
+	    var result = new Array(2);
+	    var a_Dist = 0;
+	    var retval = MISS;
+	    var d = DOT(this.m_Plane.N, a_Ray.GetDirection());
+	    if (d != 0) {
+	        var dist = -(DOT(this.m_Plane.N, a_Ray.GetOrigin()) + this.m_Plane.D) / d;
+	        if (dist > 0) {
+	            if (dist < a_Dist) {
+	                a_Dist = dist;
+	                retval = HIT;
+	                //return HIT;
+	            }
+	        }
+	    }
+	    //return MISS;
+
+	    result[0] = retval;
+	    result[1] = a_Dist;
+	    return result;
+	}
+
+    /*
 	this.Intersect = function(a_Ray, a_Dist) {
 		var d = DOT(this.m_Plane.N, a_Ray.GetDirection());
 		if(d != 0)
@@ -287,7 +342,7 @@ function PlanePrim(a_Normal, a_D)
 		}
 		return MISS;
 	}
-	
+	*/
 	// @param {vector3} a_Pos
 	// @return {vector3} normal
 	this.GetNormal = function(a_Pos) { return this.m_Plane.N; }
@@ -411,72 +466,69 @@ function Engine()
 	//@param {Color} a_Acc
 	//@param {int} a_Depth
 	//@param {float} a_RIndex a_Dist
-	this.Raytrace = function( a_Ray, a_Acc, a_Depth, a_RIndex, a_Dist) 
-	{																		
-		if(a_Depth > TRACEDEPTH) return 0;
+	this.Raytrace = function (a_Ray, a_Acc, a_Depth, a_RIndex, a_Dist) {
 
-		a_Depth = 1000000.0;
+	    if (a_Depth > TRACEDEPTH) return 0;
 
-		//@param  {vector3}
-		var pi;
-		//@param {Primitive}
-		var prim = 0;
-		//@param {int}
-		var result;
+	    a_Depth = 1000000.0;
 
-		for( var s = 0; s < this.m_Scene.GetNrPrimitives(); s++ )
-		{
-			//@param {Primitive}
-			var pr = this.m_Scene.GetPrimitive( s );
-			//@param {int}
-			var res;
-			if(res = pr.Intersect( a_Ray, a_Dist ))
-			{
-				prim = pr;
-				result = res; 
-			}
-		}
+	    //@param  {vector3}
+	    var pi;
+	    //@param {Primitive}
+	    var prim = 0;
+	    //@param {int}
+	    var result;
 
-		if (!prim) return 0;
+	    for (var s = 0; s < this.m_Scene.GetNrPrimitives(); s++) {
 
-		if (prim.IsLight())
-		{
-			a_Acc = Color( 1, 1, 1 );
-		}
-		else
-		{
-			// determine color at point of intersection
-			pi = a_Ray.GetOrigin() + a_Ray.GetDirection() * a_Dist;
-			// trace lights
-			for ( var l = 0; l < this.m_Scene.GetNrPrimitives(); l++ )
-			{
-				//@param {Primitive}
-				var p = this.m_Scene.GetPrimitive( l );
-				if (p.IsLight()) 
-				{
-					//@param {Primitive}
-					var light = p;
-					//@param {vector3}
-					var L = light.GetCentre() - pi;
-					NORMALIZE( L );
-					//@param {vector3}
-					var N = prim.GetNormal( pi );
-					if (prim.GetMaterial().GetDiffuse() > 0)
-					{
-						//@param {float}
-						var dot = DOT( N, L );
-						if (dot > 0)
-						{
-							//@param {float}
-							var diff = dot * prim.GetMaterial().GetDiffuse();
-							// add diffuse component to ray color
-							a_Acc += diff * prim.GetMaterial().GetColor() * light.GetMaterial().GetColor();
-						}
-					}
-				}
-			}
-		}
-		return prim;
+	        //@param {Primitive}
+	        var pr = this.m_Scene.GetPrimitive(s);
+	        console.log("primitive" + pr.toString());
+
+	        //@param {int}
+	        var res;
+	        if (res = pr.Intersect(a_Ray, a_Dist)) {
+	            console.log("intersect:" + res);
+	            prim = pr;
+	            result = res;
+	        }
+	    }
+
+	    if (!prim) return 0;
+
+	    if (prim.IsLight()) {
+	        a_Acc = Color(1, 1, 1);
+	    }
+	    else {
+	        // determine color at point of intersection
+	        pi = a_Ray.GetOrigin() + a_Ray.GetDirection() * a_Dist;
+	        // trace lights
+	        for (var l = 0; l < this.m_Scene.GetNrPrimitives(); l++) {
+	            //@param {Primitive}
+	            var p = this.m_Scene.GetPrimitive(l);
+	            if (p.IsLight()) {
+	                //@param {Primitive}
+	                var light = p;
+	                //@param {vector3}
+	                var L = light.GetCentre() - pi;
+	                NORMALIZE(L);
+	                //@param {vector3}
+	                var N = prim.GetNormal(pi);
+	                if (prim.GetMaterial().GetDiffuse() > 0) {
+	                    //@param {float}
+	                    var dot = DOT(N, L);
+	                    if (dot > 0) {
+	                        //@param {float}
+	                        var diff = dot * prim.GetMaterial().GetDiffuse();
+	                        // add diffuse component to ray color
+	                        a_Acc += diff * prim.GetMaterial().GetColor() * light.GetMaterial().GetColor();
+	                    }
+	                }
+	            }
+	        }
+	    }
+	    console.log("ACC: " + a_Acc.toString);
+	    return prim;
 	}
 	
 	this.InitRender = function()	
