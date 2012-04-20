@@ -183,7 +183,7 @@ function Sphere(a_Centre, a_Radius)
 	}
 
 	// @return {vertor3} centre of this sphere
-	this.GetCertre = function() { return this.m_Centre; }
+	this.GetCentre = function() { return this.m_Centre; }
 	
 	// @return {float} radius of this sphere
 	this.GetSqRadius = function() { return this.m_SqRadius; }
@@ -525,6 +525,8 @@ function Engine()
 				{
 					//@param {Primitive}
 					var light = p;
+          console.log("light is "+light.toString());
+          console.log("pi "+pi.toString());
 					//@param {vector3}
 					var L = light.GetCentre() - pi;
 					NORMALIZE( L );

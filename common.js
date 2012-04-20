@@ -118,7 +118,7 @@ function vector3(x,y,z)
 	this.Cross = function( b ) { return new vector3( this.y * b.z - this.z * b.y, this.z * b.x - this.x * b.z, this.x * b.y - this.y * b.x ); }
 
 	// @param {vector3} a_V Add a_V to this vector
-	this.Add = function( a_V ) { this.x += a_V.x; this.y += a_V.y; this.z += a_V.z; }
+	this.Add = function( a_V ) {return new vector3(this.x + a_V.x, this.y + a_V.y, this.z + a_V.z); }
 	// @param {vector3} a_V Subtract a_V from this vector
 	this.Sub = function(a_V) {return new vector3(this.x - a_V.x, this.y - a_V.y, this.z - a_V.z);}
 	//this.Sub = function( a_V ) { this.x -= a_V.x; this.y -= a_V.y; this.z -= a_V.z; }
