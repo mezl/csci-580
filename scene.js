@@ -170,7 +170,6 @@ function Primitive()
 		+ " Type: " + this.GetType() + " Normal: " + this.GetNormal(new vector3(0, 0, 0)).toString() 
 		+ " Light: " + this.IsLight().toString() + " ]";
 	}
-
 }
 
 //#############################################################################

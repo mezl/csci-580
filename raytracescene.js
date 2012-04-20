@@ -42,7 +42,7 @@ function testRaytraceScene(imageData)
 	
 	var o = new vector3(0, 0, -5);
 	var dir = new vector3(10, 20, 0);
-	var acc = new Color(0, 0, 0);
+	var acc = new vector3(0, 0, 0);
 	var a_Ray = ( o, dir);
 	var ret = C.Raytrace( a_Ray,10, 1.0);
 	console.log("Test Engine C.Raytrace: ");
@@ -58,7 +58,7 @@ function testRaytraceScene(imageData)
 function Material()
 {
 	// default constructor
-	this.m_color = new Color(0.2, 0.2, 0.2); //?
+	this.m_color = new vector3(0.2, 0.2, 0.2); //?
 	this.m_Refl = 0;
 	this.m_Diff = 0.2;
 	
@@ -378,26 +378,26 @@ function Scene()
 		this.m_Primitive[0].SetName("plane");
 		this.m_Primitive[0].GetMaterial().SetReflection(0);
 		this.m_Primitive[0].GetMaterial().SetDiffuse(1);
-		this.m_Primitive[0].GetMaterial().SetColor(new Color(0.4, 0.3, 0.3));
+		this.m_Primitive[0].GetMaterial().SetColor(new vector3(0.4, 0.3, 0.3));
 		// big sphere
 		this.m_Primitive[1] = new Sphere(new vector3(1, -0.8, 3), 2.5);
 		this.m_Primitive[1].SetName("big sphere");
 		this.m_Primitive[1].GetMaterial().SetReflection(0.6);
-		this.m_Primitive[1].GetMaterial().SetColor(new Color(0.7, 0.7, 0.7));
+		this.m_Primitive[1].GetMaterial().SetColor(new vector3(0.7, 0.7, 0.7));
 		// small sphere
 		this.m_Primitive[2] = new Sphere(new vector3(-5.5, -0.5, 7), 2);
 		this.m_Primitive[2].SetName("small sphere");
 		this.m_Primitive[2].GetMaterial().SetReflection(1.0);
 		this.m_Primitive[2].GetMaterial().SetDiffuse(0.1);
-		this.m_Primitive[2].GetMaterial().SetColor(new Color(0.7, 0.7, 1.0));
+		this.m_Primitive[2].GetMaterial().SetColor(new vector3(0.7, 0.7, 1.0));
 		// light source 1
 		this.m_Primitive[3] = new Sphere(new vector3(0, 5, 5), 0.1);
 		this.m_Primitive[3].Light(new Boolean(true));
-		this.m_Primitive[3].GetMaterial().SetColor(new Color(0.6, 0.6, 0.6));
+		this.m_Primitive[3].GetMaterial().SetColor(new vector3(0.6, 0.6, 0.6));
 		// light source 2
 		this.m_Primitive[4] = new Sphere(new vector3(2, 5, 1), 0.1);
 		this.m_Primitive[4].Light(new Boolean(true));
-		this.m_Primitive[4].GetMaterial().SetColor(new Color(0.7, 0.7, 0.9));
+		this.m_Primitive[4].GetMaterial().SetColor(new vector3(0.7, 0.7, 0.9));
 		
 		this.m_Primitives = 5;
 	}
@@ -510,12 +510,12 @@ function Engine()
 
 		if (prim.IsLight())
 		{
-			var a_Acc = new Color( 1, 1, 1 );
+			var a_Acc = new vector3( 1, 1, 1 );
 		}
 		else
 		{
 			// determine color at point of intersection
-			pi = a_Ray.GetOrigin() + a_Ray.GetDirection() * a_Dist;
+			pi = a_Ray.GetDirection().Mul(a_Dist).Add(a_Ray.GetOrigin());
 			// trace lights
 			for ( var l = 0; l < this.m_Scene.GetNrPrimitives(); l++ )
 			{
@@ -528,8 +528,8 @@ function Engine()
           console.log("light is "+light.toString());
           console.log("pi "+pi.toString());
 					//@param {vector3}
-					var L = light.GetCentre() - pi;
-					NORMALIZE( L );
+					var L = light.GetCentre().Sub(pi);
+					L.Normalize();
 					//@param {vector3}
 					var N = prim.GetNormal( pi );
 					if (prim.GetMaterial().GetDiffuse() > 0)
@@ -541,7 +541,7 @@ function Engine()
 							//@param {float}
 							var diff = dot * prim.GetMaterial().GetDiffuse();
 							// add diffuse component to ray color
-							a_Acc += diff * prim.GetMaterial().GetColor() * light.GetMaterial().GetColor();
+							a_Acc = a_ACC.Add( diff.Mul( prim.GetMaterial().GetColor().Mul(light.GetMaterial().GetColor()))); 
 						}
 					}
 				}
@@ -588,8 +588,8 @@ function Engine()
 			// render pixels for current line
 			for ( var x = 0; x < this.m_Width; x++ )
 			{
-				//@param {Color}
-				var acc = new Color( 0, 0, 0 );
+				//@param {vector3}
+				var acc = new vector3( 0, 0, 0 );
 				//@param {vector3}
 				var dir = new vector3( this.m_SX, this.m_SY, 0 ).Sub(o);
 				var nDir = NORMALIZE( dir );
@@ -614,7 +614,7 @@ function Engine()
 				if (green > 255) green = 255;
 				if (blue > 255) blue = 255;
 				
-				var cc = new Color( red, green, blue);
+				var cc = new vector3( red, green, blue);
         //console.log("X:"+x+" y:"+y+" col"+cc.toString);
 				setPixel(imageData, x, y, cc);
 				this.m_SX += this.m_DX;
