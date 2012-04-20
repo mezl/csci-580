@@ -3,11 +3,11 @@
 // 2012 Spring CS580 Final Project 4/18/2012
 // Author: Yun-Yu Chen,Sophia Chang,Vince Liao,Chin-Kai Chang
 // -----------------------------------------------------------
-testCommon();
+testRay();
 //
 //#############################################################################
 //code testing
-function testCommon()
+function testRay()
 {
 	console.log("Test raytracer.js");
 	//var A = new vector3(1,1,1);
