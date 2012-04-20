@@ -596,8 +596,10 @@ function Engine()
 				//@param {Primitive}
 				var ret = this.Raytrace( r, 1, 1.0 );
         prim = ret[0];
-        acc = ret[1];
-        dist = ret[2];
+        if(prim != 0){
+          acc = ret[1];
+          dist = ret[2];
+        }
 				//@param {int}
 				var red = acc.r * 256;
 				var green = acc.g * 256;
