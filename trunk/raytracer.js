@@ -3,11 +3,11 @@
 // 2012 Spring CS580 Final Project 4/18/2012
 // Author: Yun-Yu Chen,Sophia Chang,Vince Liao,Chin-Kai Chang
 // -----------------------------------------------------------
-testRay();
+testCommon();
 //
 //#############################################################################
 //code testing
-function testRay()
+function testCommon()
 {
 	console.log("Test raytracer.js");
 	//var A = new vector3(1,1,1);
@@ -84,6 +84,12 @@ function Ray(m_Origin, m_Direction)
 	var m_Origin = new vector3();
 	//@param {vector3}
 	var m_Direction = new vector3();
+}
+	
+function addOne(m_CurrLine)
+{
+	m_CurrLine = m_CurrLine +1;
+	return false;
 }
 
 function Scene(){}
@@ -189,7 +195,7 @@ function Engine()
 			this.m_LastRow[i] = 0;
 	}
 	
-	this.Render = function()
+	this.Render = function(imageData)
 	{
 		//@param {vector3}
 		var o = new vector3( 0, 0, -5 );
@@ -226,19 +232,17 @@ function Engine()
 				if (blue > 255) blue = 255;
 				
 				var cc = new Color( red, green, blue);
-				////***////
 				setPixel(imageData, x, y, cc);
-				////***////
 				this.m_SX += this.m_DX;
 			}
 			this.m_SY += this.m_DY;
-			// see if we've been working to long already
 			if ((/*GetTickCount()*/date.getTime() - msecs) > 100) 
 			{
 				// return control to windows so the screen gets updated
 				this.m_CurrLine = y + 1;
 				return false;
 			}
+			//var t = setTimeout("addOne( this.m_CurrLine)",100);
 		}
 		return true;
 	}
