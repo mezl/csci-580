@@ -398,7 +398,7 @@ function Primitive(){}
 function Engine()
 {
 	//default constructor
-	this.Engine = function()	{this.m_Scene = new Scene();}
+	this.m_Scene = new Scene();
 
 	//@param {Pixel} a_Dest
 	//@param {int} a_Width a_Height
