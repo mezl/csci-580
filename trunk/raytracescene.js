@@ -545,7 +545,7 @@ function Engine()
 				}
 			}
 		}
-    console.log("Color in Raytrace "+a_Acc);
+    console.log("Color in Raytrace "+a_Acc.toString);
     ret[0] = prim;
     ret[1] = a_Acc;
     ret[2] = a_Dist;
@@ -594,7 +594,6 @@ function Engine()
 				//@param {Ray}
 				var r = new Ray( o, nDir );
         
-        console.log("Ray DIR "+r.m_Direction.toString()+" nDir"+nDir.toString()+" dir"+dir.toString());
 				//@param {float}
 				var dist;
 				//@param {Primitive}
