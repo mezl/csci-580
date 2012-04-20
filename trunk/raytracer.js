@@ -74,13 +74,13 @@ function Engine()
 																			//@param {int}
 																			var result;
 	
-																			for( var s = 0; s < this.m_Scene->GetNrPrimitives(); s++ )
+																			for( var s = 0; s < this.m_Scene.GetNrPrimitives(); s++ )
 																			{
 																				//@param {Primitive}
-																				var pr = this.m_Scene->GetPrimitive( s );
+																				var pr = this.m_Scene.GetPrimitive( s );
 																				//@param {int}
 																				var res;
-																				if(res = pr->Intersect( a_Ray, a_Dist ))
+																				if(res = pr.Intersect( a_Ray, a_Dist ))
 																				{
 																					prim = pr;
 																					result = res; 
@@ -89,7 +89,7 @@ function Engine()
 	
 																			if (!prim) return 0;
 	
-																			if (prim->IsLight())
+																			if (prim.IsLight())
 																			{
 																				a_Acc = Color( 1, 1, 1 );
 																			}
@@ -98,29 +98,29 @@ function Engine()
 																				// determine color at point of intersection
 																				pi = a_Ray.GetOrigin() + a_Ray.GetDirection() * a_Dist;
 																				// trace lights
-																				for ( var l = 0; l < this.m_Scene->GetNrPrimitives(); l++ )
+																				for ( var l = 0; l < this.m_Scene.GetNrPrimitives(); l++ )
 																				{
 																					//@param {Primitive}
-																					var p = this.m_Scene->GetPrimitive( l );
-																					if (p->IsLight()) 
+																					var p = this.m_Scene.GetPrimitive( l );
+																					if (p.IsLight()) 
 																					{
 																						//@param {Primitive}
 																						var light = p;
 																						//@param {vector3}
-																						var L = ((Sphere*)light)->GetCentre() - pi;
+																						var L = ((Sphere*)light.GetCentre() - pi;
 																						NORMALIZE( L );
 																						//@param {vector3}
-																						var N = prim->GetNormal( pi );
-																						if (prim->GetMaterial()->GetDiffuse() > 0)
+																						var N = prim.GetNormal( pi );
+																						if (prim.GetMaterial().GetDiffuse() > 0)
 																						{
 																							//@param {float}
 																							var dot = DOT( N, L );
 																							if (dot > 0)
 																							{
 																								//@param {float}
-																								var diff = dot * prim->GetMaterial()->GetDiffuse();
+																								var diff = dot * prim.GetMaterial().GetDiffuse();
 																								// add diffuse component to ray color
-																								a_Acc += diff * prim->GetMaterial()->GetColor() * light->GetMaterial()->GetColor();
+																								a_Acc += diff * prim.GetMaterial().GetColor() * light.GetMaterial().GetColor();
 																							}
 																						}
 																					}
@@ -174,11 +174,8 @@ function Engine()
 										if (green > 255) green = 255;
 										if (blue > 255) blue = 255;
 										//////////*****//////////////
-										var color_arr[3];
-										color_arr[0] = red;
-										color_arr[1] = green;
-										color_arr[2] = blue;
-										setPixel( ,x, y, color_arr)
+										var cc = new Color(red, green, blue);
+										setPixel( ,x, y, cc);
 										//////////*****//////////////
 										this.m_SX += this.m_DX;
 									}
