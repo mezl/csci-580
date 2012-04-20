@@ -86,11 +86,11 @@ function Ray(m_Origin, m_Direction)
 	var m_Direction = new vector3();
 }
 	
-function addOne(m_CurrLine)
+/*function addOne(m_CurrLine)
 {
 	m_CurrLine = m_CurrLine +1;
 	return false;
-}
+}*/
 
 function Scene(){}
 function Primitive(){}
