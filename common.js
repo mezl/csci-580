@@ -120,8 +120,19 @@ function vector3(x,y,z)
 	// @param {vector3} a_V Add a_V to this vector
 	this.Add = function( a_V ) { this.x += a_V.x; this.y += a_V.y; this.z += a_V.z; }
 	// @param {vector3} a_V Subtract a_V from this vector
-	this.Sub = function( a_V ) { this.x -= a_V.x; this.y -= a_V.y; this.z -= a_V.z; }
+	this.Sub = function(a_V) {return new vector3(this.x - a_V.x, this.y - a_V.y, this.z - a_V.z);}
+	//this.Sub = function( a_V ) { this.x -= a_V.x; this.y -= a_V.y; this.z -= a_V.z; }
+	
 	// @param {float/vector3} f Multiply f to this vector,f can be a number or vector3
+	this.Mul = function( f ){
+		if(typeof f == 'number'){
+			return new vector3(this.x * f, this.y * f, this.z * f);
+		}else{
+			return new vector3(this.x * f.x, this.y * f.y, this.z * f.z);
+		}
+	}
+	
+	/*
 	this.Mul = function ( f ) {
 					if(typeof f == 'number'){
 									this.x *= f; this.y *= f; this.z *= f; 
@@ -129,6 +140,7 @@ function vector3(x,y,z)
 									{ this.x *= f.x; this.y *= f.y; this.z *= f.z; }
 					}
 	}
+	*/
 	this.Neg = function()  { return new vector3( -this.x, -this.y, -this.z ); }
 
 	// @return {String} (x,y,z) 
