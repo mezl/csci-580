@@ -6,12 +6,22 @@
 
 //typedef unsigned int Pixel;no need type in js
 //typedef vector3 Color;
+//#############################################################################
+var WHITE = new Color(255,255,255);
+var BLACK = new Color(0,0,0);
+var GREEN = new Color(0,255,0);
+var BLUE  = new Color(0,0,255);
+var RED   = new Color(255,0,0);
+//#############################################################################
 function Color(r,g,b)
 {
 	this.r = r;
 	this.g = g;
 	this.b = b;
+  this.a = 0xff;
 	this.toArray = new Array(r,g,b);
+  this.toString = "r:"+r+" g:"+g+" b:"+b;
+
 }
 
 //testCommon();//All test passed
@@ -59,6 +69,7 @@ function Rand( a_Range ) { return Math.random() * a_Range; }
 // @param {vector3} A 
 // @param {vector3} B 
 // @return {float}
+
 function DOT(A,B){return A.x*B.x+A.y*B.y+A.z*B.z;}
 function LENGTH(A){return Math.sqrt(A.x*A.x+A.y*A.y+A.z*A.z);}
 function NORMALIZE(A)	{
@@ -81,7 +92,9 @@ function vector3(x,y,z)
 {
 	//default constructor
 	if(typeof(x) == "undefined"){this.x = 0.0;this.y = 0.0; this.z = 0.0;}
-	//constructor
+	//constructor(vector3)
+	else if(typeof(y) == "undefined"){this.x = x.x;this.y = x.y; this.z = x.z;}
+	//constructor(x,y,z)
 	else	{this.x = x;this.y = y;this.z = z;}
 
 	// @param {float} a_X,a_Y,a_Z
