@@ -35,7 +35,7 @@ function testRaytraceScene(imageData)
 	var C = new Engine();
 	//console.log("Test Engine C: " + C.m_Scene.toString());	
 	///////////////////////////////////////
-	C.SetTarget( 20, 200, 500);
+	C.SetTarget( 20, 400, 300);
 	console.log("Test Engine C.SetTarget: " + C.m_Dest);
 	console.log("Test Engine C.SetTarget: " + C.m_Width);
 	console.log("Test Engine C.SetTarget: " + C.m_Height);
@@ -463,72 +463,86 @@ function Engine()
 	this.GetScene = function()  { return this.m_Scene;}
 
 	//@param {Ray} a_Ray
-	//@param {Color} a_Acc
 	//@param {int} a_Depth
-	//@param {float} a_RIndex a_Dist
-	this.Raytrace = function (a_Ray, a_Acc, a_Depth, a_RIndex, a_Dist) {
+	//@param {float} a_RIndex 
+  //@return[0] {int} normal return
+  //@return[1] {Color} a_Acc 
+  //@return[2] {float} a_Dist
+	this.Raytrace = function( a_Ray, a_Depth, a_RIndex ) 
+	{							
+    var ret = new Array(3);											
+		if(a_Depth > TRACEDEPTH) {ret[0] = 0;return ret;}
 
-	    if (a_Depth > TRACEDEPTH) return 0;
+    a_Depth = 1000000.0;
+    var a_Dists
+    //@param  {vector3}
+    var pi;
+    //@param {Primitive}
+    var prim = 0;
+    //@param {int}
+    var result;
+		for( var s = 0; s < this.m_Scene.GetNrPrimitives(); s++ )
+		{
+			//@param {Primitive}
+			var pr = this.m_Scene.GetPrimitive( s );
+			//@param {int}
+			var res;
+      console.log("ray"+a_Ray.toString()+" dist "+a_Dist);
+      var prReturn = pr.Intersect(a_Ray);
+			if(prReturn[0])
+			{
+        a_Dist = prReturn[1];
+        ret[2] = a_Dist;
+        console.log("intersect with pr"+pr.toString());
+				prim = pr;
+				result = res; 
+			}
+		}
 
-	    a_Depth = 1000000.0;
+		if (!prim) {ret[0]=0;return ret;};
 
-	    //@param  {vector3}
-	    var pi;
-	    //@param {Primitive}
-	    var prim = 0;
-	    //@param {int}
-	    var result;
-
-	    for (var s = 0; s < this.m_Scene.GetNrPrimitives(); s++) {
-
-	        //@param {Primitive}
-	        var pr = this.m_Scene.GetPrimitive(s);
-	        console.log("primitive" + pr.toString());
-
-	        //@param {int}
-	        var res;
-	        if (res = pr.Intersect(a_Ray, a_Dist)) {
-	            console.log("intersect:" + res);
-	            prim = pr;
-	            result = res;
-	        }
-	    }
-
-	    if (!prim) return 0;
-
-	    if (prim.IsLight()) {
-	        a_Acc = Color(1, 1, 1);
-	    }
-	    else {
-	        // determine color at point of intersection
-	        pi = a_Ray.GetOrigin() + a_Ray.GetDirection() * a_Dist;
-	        // trace lights
-	        for (var l = 0; l < this.m_Scene.GetNrPrimitives(); l++) {
-	            //@param {Primitive}
-	            var p = this.m_Scene.GetPrimitive(l);
-	            if (p.IsLight()) {
-	                //@param {Primitive}
-	                var light = p;
-	                //@param {vector3}
-	                var L = light.GetCentre() - pi;
-	                NORMALIZE(L);
-	                //@param {vector3}
-	                var N = prim.GetNormal(pi);
-	                if (prim.GetMaterial().GetDiffuse() > 0) {
-	                    //@param {float}
-	                    var dot = DOT(N, L);
-	                    if (dot > 0) {
-	                        //@param {float}
-	                        var diff = dot * prim.GetMaterial().GetDiffuse();
-	                        // add diffuse component to ray color
-	                        a_Acc += diff * prim.GetMaterial().GetColor() * light.GetMaterial().GetColor();
-	                    }
-	                }
-	            }
-	        }
-	    }
-	    console.log("ACC: " + a_Acc.toString);
-	    return prim;
+		if (prim.IsLight())
+		{
+			var a_Acc = new Color( 1, 1, 1 );
+		}
+		else
+		{
+			// determine color at point of intersection
+			pi = a_Ray.GetOrigin() + a_Ray.GetDirection() * a_Dist;
+			// trace lights
+			for ( var l = 0; l < this.m_Scene.GetNrPrimitives(); l++ )
+			{
+				//@param {Primitive}
+				var p = this.m_Scene.GetPrimitive( l );
+				if (p.IsLight()) 
+				{
+					//@param {Primitive}
+					var light = p;
+					//@param {vector3}
+					var L = light.GetCentre() - pi;
+					NORMALIZE( L );
+					//@param {vector3}
+					var N = prim.GetNormal( pi );
+					if (prim.GetMaterial().GetDiffuse() > 0)
+					{
+						//@param {float}
+						var dot = DOT( N, L );
+						if (dot > 0)
+						{
+							//@param {float}
+							var diff = dot * prim.GetMaterial().GetDiffuse();
+							// add diffuse component to ray color
+							a_Acc += diff * prim.GetMaterial().GetColor() * light.GetMaterial().GetColor();
+						}
+					}
+				}
+			}
+		}
+    console.log("Color in Raytrace "+a_Acc);
+    ret[0] = prim;
+    ret[1] = a_Acc;
+    ret[2] = a_Dist;
+		return ret;
 	}
 	
 	this.InitRender = function()	
@@ -546,6 +560,10 @@ function Engine()
 	
 	this.Render = function(imageData)
 	{
+    for(var i = 255;i> 0 ;i--)
+    {
+      setPixel(imageData,i,255-i,RED);
+    }
 		//@param {vector3}
 		var o = new vector3( 0, 0, -5 );
 		//@param {int}
@@ -556,6 +574,7 @@ function Engine()
 		// render remaining lines
 		for ( var y = this.m_CurrLine; y < (this.m_Height - 20); y++ )
 		{
+      //console.log("currLine="+this.m_CurrLine+" y="+y+" Height="+this.m_Height);
 			this.m_SX = this.m_WX1;
 			// render pixels for current line
 			for ( var x = 0; x < this.m_Width; x++ )
@@ -581,6 +600,7 @@ function Engine()
 				if (blue > 255) blue = 255;
 				
 				var cc = new Color( red, green, blue);
+        //console.log("X:"+x+" y:"+y+" col"+cc.toString);
 				setPixel(imageData, x, y, cc);
 				this.m_SX += this.m_DX;
 			}
