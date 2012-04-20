@@ -385,15 +385,7 @@ function Ray(m_Origin, m_Direction)
 	//@param {vector3}
 	var m_Direction = new vector3();
 }
-	
-/*function addOne(m_CurrLine)
-{
-	m_CurrLine = m_CurrLine +1;
-	return false;
-}*/
 
-function Scene(){}
-function Primitive(){}
 // class Engine
 function Engine()
 {
