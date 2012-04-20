@@ -3,19 +3,71 @@
 // 2012 Spring CS580 Final Project 4/18/2012
 // Author: Yun-Yu Chen,Sophia Chang,Vince Liao,Chin-Kai Chang
 // -----------------------------------------------------------
-
+testCommon();
+//
+//#############################################################################
+//code testing
+function testCommon()
+{
+	console.log("Test raytracer.js");
+	//var A = new vector3(1,1,1);
+	var m_Origin = new vector3();
+	var m_Direction = new vector3();
+	var a_Origin = new vector3( 3, 3, 3);
+	var a_Dir = new vector3( 4, 4, 4);
+	console.log("Test Ray a_Origin: " + a_Origin.toString());
+	console.log("Test Ray a_Dir: " + a_Dir.toString());
+	var A = new Ray( a_Origin, a_Dir);
+	console.log("Test Ray A: " + A.m_Origin.toString());
+	console.log("Test Ray A: " + A.m_Direction.toString());
+	var B = new Ray();//test default constructor
+	console.log("Test Ray B: " + B.m_Origin.toString());
+	console.log("Test Ray B: " + B.m_Direction.toString());
+	B.SetOrigin(a_Origin);
+	console.log("Test Ray B.SetOrigin: " + B.m_Origin.toString());
+	B.SetDirection(a_Dir);
+	console.log("Test Ray B.SetDirection: " + B.m_Direction.toString());
+	B.GetOrigin();
+	console.log("Test Ray B.GetOrigin: " + B.m_Origin.toString());
+	B.GetDirection();
+	console.log("Test Ray B.GetDirection: " + B.m_Direction.toString());
+	/////////////////////////////////////////
+	var C = new Engine();
+	//console.log("Test Engine C: " + C.m_Scene.toString());	
+	///////////////////////////////////////
+	C.SetTarget( 20, 200, 500);
+	console.log("Test Engine C.SetTarget: " + C.m_Dest);
+	console.log("Test Engine C.SetTarget: " + C.m_Width);
+	console.log("Test Engine C.SetTarget: " + C.m_Height);
+	
+	var o = new vector3(0, 0, -5);
+	var dir = new vector3(10, 20, 0);
+	var acc = new Color(0, 0, 0);
+	var a_Ray = ( o, dir);
+	C.Raytrace( a_Ray, acc, 10, 1.0, 2.0);
+	console.log("Test Engine C.Raytrace: ");
+	var D = C.GetScene();
+	console.log("Test Engine C.GetScene = D: ");
+	C.InitRender( );
+	console.log("Test Engine C.InitRender: ");
+	C.Render();
+	console.log("Test Engine C.Render: ");//*/
+}
 //#############################################################################
 // @param {vector3} m_Origin m_Direction
 // class Ray
 function Ray(m_Origin, m_Direction)
 {
 	//default constructor
-	if(typeof(m_Origin) == "undefined") {
+	if(typeof(m_Origin) == "undefined") {	
 											this.m_Origin = new vector3( 0, 0, 0 );
 											this.m_Direction = new vector3( 0, 0, 0 );
 										}										
 	//constructor
-	else 	{ this.m_Origin = a_Origin; this.m_Direction = a_Dir;}
+	else	{ 
+				this.m_Origin = m_Origin; 
+				this.m_Direction = m_Direction;
+			}
 
 	
 	//@param {vector3} a_Origin
@@ -29,18 +81,18 @@ function Ray(m_Origin, m_Direction)
 	this.GetDirection = function() { return this.m_Direction;}
 
 	//@param {vector3}
-	var m_Origin;
+	var m_Origin = new vector3();
 	//@param {vector3}
-	var m_Direction;
+	var m_Direction = new vector3();
 }
 
-function Scene;
-function Primitive;
+function Scene(){}
+function Primitive(){}
 // class Engine
 function Engine()
 {
 	//default constructor
-	if(typeof() == "undefined") { this.m_Scene = new Scene();}
+	this.Engine = function()	{this.m_Scene = new Scene();}
 
 	//@param {Pixel} a_Dest
 	//@param {int} a_Width a_Height
@@ -112,10 +164,10 @@ function Engine()
 						var dot = DOT( N, L );
 						if (dot > 0)
 						{
-						//@param {float}
-						var diff = dot * prim.GetMaterial().GetDiffuse();
-						// add diffuse component to ray color
-						a_Acc += diff * prim.GetMaterial().GetColor() * light.GetMaterial().GetColor();
+							//@param {float}
+							var diff = dot * prim.GetMaterial().GetDiffuse();
+							// add diffuse component to ray color
+							a_Acc += diff * prim.GetMaterial().GetColor() * light.GetMaterial().GetColor();
 						}
 					}
 				}
@@ -133,15 +185,16 @@ function Engine()
 		this.m_DY = (this.m_WY2 - this.m_WY1) / this.m_Height;
 		this.m_SY += this.m_CurrLine * this.m_DY;
 		this.m_LastRow = new Primitive*[this.m_Width];
-		memset( this.m_LastRow, 0, this.m_Width * 4 );
+		for( var i = 0; i < this.m_Width * 4; i++)
+			this.m_LastRow[i] = 0;
 	}
 	
 	this.Render = function()
 	{
 		//@param {vector3}
-		var o( 0, 0, -5 );
+		var o = new vector3( 0, 0, -5 );
 		//@param {int}
-		var msecs = GetTickCount();
+		var msecs = new GetTickCount();
 		//@param {Primitive}
 		var lastprim = 0;
 		// render remaining lines
@@ -152,12 +205,12 @@ function Engine()
 			for ( var x = 0; x < this.m_Width; x++ )
 			{
 				//@param {Color}
-				var acc( 0, 0, 0 );
+				var acc = new vector3( 0, 0, 0 );
 				//@param {vector3}
 				var dir = vector3( m_SX, m_SY, 0 ) - o;
 				NORMALIZE( dir );
 				//@param {Ray}
-				var r( o, dir );
+				var r = new Ray( o, dir );
 				//@param {float}
 				var dist;
 				//@param {Primitive}
