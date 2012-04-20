@@ -189,11 +189,10 @@ function Sphere(a_Centre, a_Radius)
 	this.GetSqRadius = function() { return this.m_SqRadius; }
 	
 	// @param {Ray} a_Ray
-	// @param {float} a_Dist
-	// @return {int} intersection type
+	// @return {Array} [0] intersection type [1] distance
 	this.Intersect = function (a_Ray) {
 	    var result = new Array(2);
-	    var a_Dist = 0;
+	    var a_Dist = Number.MAX_VALUE;
 	    var v = a_Ray.GetOrigin().Sub(this.m_Centre);
 	    var b = -DOT(v, a_Ray.GetDirection());
 	    var det = (b * b) - DOT(v, v) + this.m_SqRadius;
@@ -222,42 +221,45 @@ function Sphere(a_Centre, a_Radius)
 
 	    return result;
 	}
-    /*
+	/*
+    // @param {Ray} a_Ray
+	// @param {float} a_Dist
+	// @return {int} intersection type
 	this.Intersect = function(a_Ray, a_Dist) {
-		//console.log(a_Ray.GetOrigin() + " " + this.m_Centre);
-		var v = a_Ray.GetOrigin().Sub(this.m_Centre);
-		//console.log("Intersect: v = " + v);
-		var b = - DOT(v, a_Ray.GetDirection());
-		//console.log("Intersect: b = " + b);
-		var det = (b * b) - DOT(v, v) + this.m_SqRadius;
-		//console.log("Intesect: det = " + det);
-		var retval = MISS;
-		if(det > 0)
-		{
-			det = Math.sqrt(det);
-			var i1 = b - det;
-			var i2 = b + det;
-			if( i2 > 0 )
-			{
-				if( i1 < 0 )
-				{
-					if( i2 < a_Dist )
-					{
-						a_Dist = i2;
-						retval = INPRIM;
-					}
-				}
-				else
-				{
-					if( i1 < a_Dist )
-					{
-						a_Dist = i1;
-						retval = HIT;
-					}
-				}
-			}
-		}
-		return retval;
+	//console.log(a_Ray.GetOrigin() + " " + this.m_Centre);
+	var v = a_Ray.GetOrigin().Sub(this.m_Centre);
+	//console.log("Intersect: v = " + v);
+	var b = - DOT(v, a_Ray.GetDirection());
+	//console.log("Intersect: b = " + b);
+	var det = (b * b) - DOT(v, v) + this.m_SqRadius;
+	//console.log("Intesect: det = " + det);
+	var retval = MISS;
+	if(det > 0)
+	{
+	det = Math.sqrt(det);
+	var i1 = b - det;
+	var i2 = b + det;
+	if( i2 > 0 )
+	{
+	if( i1 < 0 )
+	{
+	if( i2 < a_Dist )
+	{
+	a_Dist = i2;
+	retval = INPRIM;
+	}
+	}
+	else
+	{
+	if( i1 < a_Dist )
+	{
+	a_Dist = i1;
+	retval = HIT;
+	}
+	}
+	}
+	}
+	return retval;
 	}
 	*/
 	// @param {vector3} a_Pos
@@ -301,11 +303,10 @@ function PlanePrim(a_Normal, a_D)
 	this.GetD = function() { return this.m_Plane.D; }
 	
 	// @param {Ray} a_Ray
-	// @param {float} a_Dist
-	// @return {int} intersection type
+	// @return {Array} [0] intersection type [1] distance
 	this.Intersect = function (a_Ray) {
 	    var result = new Array(2);
-	    var a_Dist = 0;
+	    var a_Dist = Number.MAX_VALUE;
 	    var retval = MISS;
 	    var d = DOT(this.m_Plane.N, a_Ray.GetDirection());
 	    if (d != 0) {
@@ -325,22 +326,26 @@ function PlanePrim(a_Normal, a_D)
 	    return result;
 	}
 
-    /*
+	/*
+    // @param {Ray} a_Ray
+	// @param {float} a_Dist
+	// @return {int} intersection type
+
 	this.Intersect = function(a_Ray, a_Dist) {
-		var d = DOT(this.m_Plane.N, a_Ray.GetDirection());
-		if(d != 0)
-		{
-			var dist = - (DOT(this.m_Plane.N, a_Ray.GetOrigin()) + this.m_Plane.D) / d;
-			if( dist > 0 )
-			{
-				if( dist < a_Dist)
-				{
-					a_Dist = dist;
-					return HIT;
-				}
-			}
-		}
-		return MISS;
+	var d = DOT(this.m_Plane.N, a_Ray.GetDirection());
+	if(d != 0)
+	{
+	var dist = - (DOT(this.m_Plane.N, a_Ray.GetOrigin()) + this.m_Plane.D) / d;
+	if( dist > 0 )
+	{
+	if( dist < a_Dist)
+	{
+	a_Dist = dist;
+	return HIT;
+	}
+	}
+	}
+	return MISS;
 	}
 	*/
 	// @param {vector3} a_Pos
@@ -582,7 +587,7 @@ function Engine()
 				//@param {Color}
 				var acc = new vector3( 0, 0, 0 );
 				//@param {vector3}
-				var dir = vector3( m_SX, m_SY, 0 ) - o;
+				var dir = vector3( this.m_SX, this.m_SY, 0 ) - o;
 				NORMALIZE( dir );
 				//@param {Ray}
 				var r = new Ray( o, dir );
