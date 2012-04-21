@@ -58,9 +58,12 @@ function testRaytraceScene(imageData)
 function Material()
 {
 	// default constructor
-	this.m_color = new vector3(0.2, 0.2, 0.2); //?
+	this.m_color = new vector3(0.2, 0.2, 0.2);
 	this.m_Refl = 0;
+	this.m_Refr = 0;
 	this.m_Diff = 0.2;
+	this.m_Spec = 0.8;
+	this.m_RIndex = 1.5;
 	
 	// @param {Color} a_color
 	this.SetColor = function(a_color) { this.m_color = a_color; }
@@ -71,9 +74,15 @@ function Material()
 	// @param {float} a_Diff
 	this.SetDiffuse = function(a_Diff) { this.m_Diff = a_Diff; }
 	
+	// @param {float} a_Spec
+	this.SetSpecular = function(a_Spec) { this.m_Spec = a_Spec; }
+	
 	// @param {float} a_Refl
 	this.SetReflection = function(a_Refl) { this.m_Refl = a_Refl; }
 
+	// @param {float} a_Refr
+	this.SetRefraction = function(a_Refr) { this.m_Refr = a_Refr; }
+	
 	// @return {float} specular of this material
 	this.GetSpecular = function() { return 1.0 - this.m_Diff; }
 	
@@ -83,10 +92,20 @@ function Material()
 	// @return {float} reflection of this material
 	this.GetReflection = function () { return this.m_Refl; }
 	
+	// @return {float} refraction of this material
+	this.GetRefraction = function() { return this.m_Refr; }
+	
+	// @param {float} a_RIndex
+	this.SetRefrIndex = function(a_RIndex) { this.m_RIndex = a_RIndex; }
+	
+	// @return {float} RIndex of this material
+	this.GetRefrIndex = function() { return this.m_RIndex; }
+	
 	// @return {String}
 	this.toString = function() { 
-		return "[ Material Color: " + this.m_color.toString +" Refl: " + this.m_Refl 
-		+ " Diff: " + this.m_Diff + " Spec: " + this.GetSpecular() + " ]"; 
+		return "[ Material Color: " + this.m_color.toString() +" Refl: " + this.m_Refl 
+		+ " Refr: " + this.m_Refr + " Diff: " + this.m_Diff 
+		+ " Spec: " + this.m_Spec + "RIndex: " + this.m_RIndex + " ]"; 
 	}
 }
 
@@ -221,47 +240,7 @@ function Sphere(a_Centre, a_Radius)
 
 	    return result;
 	}
-	/*
-    // @param {Ray} a_Ray
-	// @param {float} a_Dist
-	// @return {int} intersection type
-	this.Intersect = function(a_Ray, a_Dist) {
-	//console.log(a_Ray.GetOrigin() + " " + this.m_Centre);
-	var v = a_Ray.GetOrigin().Sub(this.m_Centre);
-	//console.log("Intersect: v = " + v);
-	var b = - DOT(v, a_Ray.GetDirection());
-	//console.log("Intersect: b = " + b);
-	var det = (b * b) - DOT(v, v) + this.m_SqRadius;
-	//console.log("Intesect: det = " + det);
-	var retval = MISS;
-	if(det > 0)
-	{
-	det = Math.sqrt(det);
-	var i1 = b - det;
-	var i2 = b + det;
-	if( i2 > 0 )
-	{
-	if( i1 < 0 )
-	{
-	if( i2 < a_Dist )
-	{
-	a_Dist = i2;
-	retval = INPRIM;
-	}
-	}
-	else
-	{
-	if( i1 < a_Dist )
-	{
-	a_Dist = i1;
-	retval = HIT;
-	}
-	}
-	}
-	}
-	return retval;
-	}
-	*/
+
 	// @param {vector3} a_Pos
 	// @return {vector3} normal
 	this.GetNormal = function(a_Pos) {return (a_Pos.Sub(this.m_Centre)).Mul(this.m_RRadius); }
@@ -326,28 +305,6 @@ function PlanePrim(a_Normal, a_D)
 	    return result;
 	}
 
-	/*
-    // @param {Ray} a_Ray
-	// @param {float} a_Dist
-	// @return {int} intersection type
-
-	this.Intersect = function(a_Ray, a_Dist) {
-	var d = DOT(this.m_Plane.N, a_Ray.GetDirection());
-	if(d != 0)
-	{
-	var dist = - (DOT(this.m_Plane.N, a_Ray.GetOrigin()) + this.m_Plane.D) / d;
-	if( dist > 0 )
-	{
-	if( dist < a_Dist)
-	{
-	a_Dist = dist;
-	return HIT;
-	}
-	}
-	}
-	return MISS;
-	}
-	*/
 	// @param {vector3} a_Pos
 	// @return {vector3} normal
 	this.GetNormal = function(a_Pos) { return this.m_Plane.N; }
@@ -371,35 +328,78 @@ function Scene()
 	    Sphere.prototype = new Primitive(); // set parent
 	    PlanePrim.prototype = new Primitive(); // set parent
 
-		this.m_Primitive = new Array(100);
+		this.m_Primitive = new Array(500);
 		// ground plane
 		this.m_Primitive[0] = new PlanePrim(new vector3(0, 1, 0), 4.4);
 		this.m_Primitive[0].prototype = new Primitive();
 		this.m_Primitive[0].SetName("plane");
 		this.m_Primitive[0].GetMaterial().SetReflection(0);
+		this.m_Primitive[0].GetMaterial().SetRefraction(0);
 		this.m_Primitive[0].GetMaterial().SetDiffuse(1);
 		this.m_Primitive[0].GetMaterial().SetColor(new vector3(0.4, 0.3, 0.3));
 		// big sphere
-		this.m_Primitive[1] = new Sphere(new vector3(1, -0.8, 3), 2.5);
+		this.m_Primitive[1] = new Sphere(new vector3(2, -0.8, 3), 2.5);
 		this.m_Primitive[1].SetName("big sphere");
-		this.m_Primitive[1].GetMaterial().SetReflection(0.6);
-		this.m_Primitive[1].GetMaterial().SetColor(new vector3(0.7, 0.7, 0.7));
+		this.m_Primitive[1].GetMaterial().SetReflection(0.2);
+		this.m_Primitive[1].GetMaterial().SetRefraction(0.8);
+		this.m_Primitive[1].GetMaterial().SetRefrIndex(1.3);
+		this.m_Primitive[1].GetMaterial().SetColor(new vector3(0.7, 0.7, 1.0));
 		// small sphere
 		this.m_Primitive[2] = new Sphere(new vector3(-5.5, -0.5, 7), 2);
 		this.m_Primitive[2].SetName("small sphere");
-		this.m_Primitive[2].GetMaterial().SetReflection(1.0);
+		this.m_Primitive[2].GetMaterial().SetReflection(0.5);
+		this.m_Primitive[2].GetMaterial().SetRefraction(0);
+		this.m_Primitive[2].GetMaterial().SetRefrIndex(1.3);
 		this.m_Primitive[2].GetMaterial().SetDiffuse(0.1);
 		this.m_Primitive[2].GetMaterial().SetColor(new vector3(0.7, 0.7, 1.0));
 		// light source 1
 		this.m_Primitive[3] = new Sphere(new vector3(0, 5, 5), 0.1);
 		this.m_Primitive[3].Light(new Boolean(true));
-		this.m_Primitive[3].GetMaterial().SetColor(new vector3(0.6, 0.6, 0.6));
+		this.m_Primitive[3].GetMaterial().SetColor(new vector3(0.6, 0.6, 0.8));
 		// light source 2
-		this.m_Primitive[4] = new Sphere(new vector3(2, 5, 1), 0.1);
+		this.m_Primitive[4] = new Sphere(new vector3(-3, 5, 1), 0.1);
 		this.m_Primitive[4].Light(new Boolean(true));
-		this.m_Primitive[4].GetMaterial().SetColor(new vector3(0.7, 0.7, 0.9));
+		this.m_Primitive[4].GetMaterial().SetColor(new vector3(0.6, 0.6, 0.8));
+		// extra sphere
+		this.m_Primitive[5] = new Sphere(new vector3(-1.5, -3.8, 1), 1.5);
+		this.m_Primitive[5].SetName("extra sphere");
+		this.m_Primitive[5].GetMaterial().SetReflection(0);
+		this.m_Primitive[5].GetMaterial().SetRefraction(0.8);
+		this.m_Primitive[5].GetMaterial().SetColor( new vector3(1.0, 0.4, 0.4));
+		// back plane
+		this.m_Primitive[6] = new PlanePrim( new vector3(0.4, 0, -1), 12);
+		this.m_Primitive[6].SetName("back plane");
+		this.m_Primitive[6].GetMaterial().SetReflection(0);
+		this.m_Primitive[6].GetMaterial().SetRefraction(0);
+		this.m_Primitive[6].GetMaterial().SetSpecular(0);
+		this.m_Primitive[6].GetMaterial().SetDiffuse(0.6);
+		this.m_Primitive[6].GetMaterial().SetColor(new vector3(0.5, 0.3, 0.5));
+		// ceiling plane
+		this.m_Primitive[7] = new PlanePrim( new vector3(0, -1, 0), 7.4);
+		this.m_Primitive[7].SetName("back plane");
+		this.m_Primitive[7].GetMaterial().SetReflection(0);
+		this.m_Primitive[7].GetMaterial().SetRefraction(0);
+		this.m_Primitive[7].GetMaterial().SetSpecular(0);
+		this.m_Primitive[7].GetMaterial().SetDiffuse(0.5);
+		this.m_Primitive[7].GetMaterial().SetColor( new vector3(0.4, 0.7, 0.7));
+		//grid
+		var prim = 8;
+		for( x = 0; x < 8; x = x + 1)
+		{
+			for( y = 0; y < 7; y = y + 1)
+			{
+				this.m_Primitive[prim] = new Sphere ( new vector3(- 4.5 + x * 1.5, -4.3 + y * 1.5, 10), 0.3);
+				this.m_Primitive[prim].SetName("grid sphere");
+				this.m_Primitive[prim].GetMaterial().SetReflection(0);
+				this.m_Primitive[prim].GetMaterial().SetRefraction(0);
+				this.m_Primitive[prim].GetMaterial().SetSpecular(0.6);
+				this.m_Primitive[prim].GetMaterial().SetDiffuse(0.6);
+				this.m_Primitive[prim].GetMaterial().SetColor( new vector3(0.3, 1.0, 0.4));
+				prim = prim + 1;
+			}
+		}
 		
-		this.m_Primitives = 5;
+		this.m_Primitives = prim;
 	}
 	
 	// @return {float} number of primitives in this scene
@@ -526,6 +526,7 @@ function Engine()
 				{
 					//@param {Primitive}
 					var light = p;
+
 					//@param {vector3}
 					var L = light.GetCentre().Sub(pi);
 					L.Normalize();
