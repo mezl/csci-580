@@ -496,6 +496,7 @@ function Engine()
 			//@param {int}
 			var res;
 			var prReturn = pr.Intersect(a_Ray);
+			
 			if(prReturn[0] != 0)
 			{
 				a_Dist = prReturn[1];

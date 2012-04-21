@@ -7,51 +7,50 @@
 //
 //#############################################################################
 //code testing
-function testRaytraceScene(imageData)
-{
-	console.log("Test raytracer.js");
-	//var A = new vector3(1,1,1);
-	var m_Origin = new vector3();
-	var m_Direction = new vector3();
-	var a_Origin = new vector3( 3, 3, 3);
-	var a_Dir = new vector3( 4, 4, 4);
-	console.log("Test Ray a_Origin: " + a_Origin.toString());
-	console.log("Test Ray a_Dir: " + a_Dir.toString());
-	var A = new Ray( a_Origin, a_Dir);
-	console.log("Test Ray A: " + A.m_Origin.toString());
-	console.log("Test Ray A: " + A.m_Direction.toString());
-	var B = new Ray();//test default constructor
-	console.log("Test Ray B: " + B.m_Origin.toString());
-	console.log("Test Ray B: " + B.m_Direction.toString());
-	B.SetOrigin(a_Origin);
-	console.log("Test Ray B.SetOrigin: " + B.m_Origin.toString());
-	B.SetDirection(a_Dir);
-	console.log("Test Ray B.SetDirection: " + B.m_Direction.toString());
-	B.GetOrigin();
-	console.log("Test Ray B.GetOrigin: " + B.m_Origin.toString());
-	B.GetDirection();
-	console.log("Test Ray B.GetDirection: " + B.m_Direction.toString());
-	/////////////////////////////////////////
-	var C = new Engine();
-	//console.log("Test Engine C: " + C.m_Scene.toString());	
-	///////////////////////////////////////
-	C.SetTarget( 20, 400, 300);
-	console.log("Test Engine C.SetTarget: " + C.m_Dest);
-	console.log("Test Engine C.SetTarget: " + C.m_Width);
-	console.log("Test Engine C.SetTarget: " + C.m_Height);
-	
-	var o = new vector3(0, 0, -5);
-	var dir = new vector3(10, 20, 0);
-	var acc = new vector3(0, 0, 0);
-	var a_Ray = ( o, dir);
-	var ret = C.Raytrace( a_Ray,10, 1.0);
-	console.log("Test Engine C.Raytrace: ");
-	var D = C.GetScene();
-	console.log("Test Engine C.GetScene = D: ");
-	C.InitRender( );
-	console.log("Test Engine C.InitRender: ");
-	C.Render(imageData);
-	console.log("Test Engine C.Render: ");//*/
+function testRaytraceScene(imageData) {
+    console.log("Test raytracer.js");
+    //var A = new vector3(1,1,1);
+    var m_Origin = new vector3();
+    var m_Direction = new vector3();
+    var a_Origin = new vector3(3, 3, 3);
+    var a_Dir = new vector3(4, 4, 4);
+    console.log("Test Ray a_Origin: " + a_Origin.toString());
+    console.log("Test Ray a_Dir: " + a_Dir.toString());
+    var A = new Ray(a_Origin, a_Dir);
+    console.log("Test Ray A: " + A.m_Origin.toString());
+    console.log("Test Ray A: " + A.m_Direction.toString());
+    var B = new Ray(); //test default constructor
+    console.log("Test Ray B: " + B.m_Origin.toString());
+    console.log("Test Ray B: " + B.m_Direction.toString());
+    B.SetOrigin(a_Origin);
+    console.log("Test Ray B.SetOrigin: " + B.m_Origin.toString());
+    B.SetDirection(a_Dir);
+    console.log("Test Ray B.SetDirection: " + B.m_Direction.toString());
+    B.GetOrigin();
+    console.log("Test Ray B.GetOrigin: " + B.m_Origin.toString());
+    B.GetDirection();
+    console.log("Test Ray B.GetDirection: " + B.m_Direction.toString());
+    /////////////////////////////////////////
+    var C = new Engine();
+    //console.log("Test Engine C: " + C.m_Scene.toString());	
+    ///////////////////////////////////////
+    C.SetTarget(20, 400, 300);
+    console.log("Test Engine C.SetTarget: " + C.m_Dest);
+    console.log("Test Engine C.SetTarget: " + C.m_Width);
+    console.log("Test Engine C.SetTarget: " + C.m_Height);
+
+    var o = new vector3(0, 0, -5);
+    var dir = new vector3(10, 20, 0);
+    var acc = new vector3(0, 0, 0);
+    var a_Ray = (o, dir);
+    var ret = C.Raytrace(a_Ray, 10, 1.0);
+    console.log("Test Engine C.Raytrace: ");
+    var D = C.GetScene();
+    console.log("Test Engine C.GetScene = D: ");
+    C.InitRender();
+    console.log("Test Engine C.InitRender: ");
+    C.Render(imageData);
+    console.log("Test Engine C.Render: "); //*/
 }
 //#############################################################################
 // class Material
@@ -235,40 +234,40 @@ function Sphere(a_Centre, a_Radius) {
 
         return result;
     }
-    
+
     /*
     // @param {Ray} a_Ray
     // @return {Array} [0] intersection type [1] distance
     this.Intersect = function (a_Ray) {
-        var result = new Array(2);
-        var a_Dist = Number.MAX_VALUE;
-        var v = a_Ray.GetOrigin().Sub(this.m_Centre);
-        var b = -DOT(v, a_Ray.GetDirection());
-        var det = (b * b) - DOT(v, v) + this.m_SqRadius;
-        var retval = MISS;
-        if (det > 0) {
-            det = Math.sqrt(det);
-            var i1 = b - det;
-            var i2 = b + det;
-            if (i2 > 0) {
-                if (i1 < 0) {
-                    if (i2 < a_Dist) {
-                        a_Dist = i2;
-                        retval = INPRIM;
-                    }
-                }
-                else {
-                    if (i1 < a_Dist) {
-                        a_Dist = i1;
-                        retval = HIT;
-                    }
-                }
-            }
-        }
-        result[0] = retval;
-        result[1] = a_Dist;
+    var result = new Array(2);
+    var a_Dist = Number.MAX_VALUE;
+    var v = a_Ray.GetOrigin().Sub(this.m_Centre);
+    var b = -DOT(v, a_Ray.GetDirection());
+    var det = (b * b) - DOT(v, v) + this.m_SqRadius;
+    var retval = MISS;
+    if (det > 0) {
+    det = Math.sqrt(det);
+    var i1 = b - det;
+    var i2 = b + det;
+    if (i2 > 0) {
+    if (i1 < 0) {
+    if (i2 < a_Dist) {
+    a_Dist = i2;
+    retval = INPRIM;
+    }
+    }
+    else {
+    if (i1 < a_Dist) {
+    a_Dist = i1;
+    retval = HIT;
+    }
+    }
+    }
+    }
+    result[0] = retval;
+    result[1] = a_Dist;
 
-        return result;
+    return result;
     }*/
 
     // @param {vector3} a_Pos
@@ -329,30 +328,30 @@ function PlanePrim(a_Normal, a_D) {
         result[1] = a_Dist;
         return result;
     }
-    
+
     /*
     // @param {Ray} a_Ray
     // @return {Array} [0] intersection type [1] distance
     this.Intersect = function (a_Ray) {
-        var result = new Array(2);
-        var a_Dist = Number.MAX_VALUE;
-        var retval = MISS;
-        var d = DOT(this.m_Plane.N, a_Ray.GetDirection());
-        if (d != 0) {
-            var dist = -(DOT(this.m_Plane.N, a_Ray.GetOrigin()) + this.m_Plane.D) / d;
-            if (dist > 0) {
-                if (dist < a_Dist) {
-                    a_Dist = dist;
-                    retval = HIT;
-                    //return HIT;
-                }
-            }
-        }
-        //return MISS;
+    var result = new Array(2);
+    var a_Dist = Number.MAX_VALUE;
+    var retval = MISS;
+    var d = DOT(this.m_Plane.N, a_Ray.GetDirection());
+    if (d != 0) {
+    var dist = -(DOT(this.m_Plane.N, a_Ray.GetOrigin()) + this.m_Plane.D) / d;
+    if (dist > 0) {
+    if (dist < a_Dist) {
+    a_Dist = dist;
+    retval = HIT;
+    //return HIT;
+    }
+    }
+    }
+    //return MISS;
 
-        result[0] = retval;
-        result[1] = a_Dist;
-        return result;
+    result[0] = retval;
+    result[1] = a_Dist;
+    return result;
     }*/
 
     // @param {vector3} a_Pos
@@ -466,341 +465,312 @@ function Scene() {
 //#############################################################################
 // @param {vector3} m_Origin m_Direction
 // class Ray
-function Ray(m_Origin, m_Direction)
-{
-	//default constructor
-	if(typeof(m_Origin) == "undefined") {	
-											this.m_Origin = new vector3( 0, 0, 0 );
-											this.m_Direction = new vector3( 0, 0, 0 );
-										}										
-	//constructor
-	else	{ 
-				this.m_Origin = m_Origin; 
-				this.m_Direction = m_Direction;
-			}
+function Ray(m_Origin, m_Direction) {
+    //default constructor
+    if (typeof (m_Origin) == "undefined") {
+        this.m_Origin = new vector3(0, 0, 0);
+        this.m_Direction = new vector3(0, 0, 0);
+    }
+    //constructor
+    else {
+        this.m_Origin = m_Origin;
+        this.m_Direction = m_Direction;
+    }
 
-	
-	//@param {vector3} a_Origin
-	this.SetOrigin = function( a_Origin) { this.m_Origin = a_Origin;}
 
-	//@param {vector3} a_Origin
-	this.SetDirection = function( a_Direction) { this.m_Direction = a_Direction;}
+    //@param {vector3} a_Origin
+    this.SetOrigin = function (a_Origin) { this.m_Origin = a_Origin; }
 
-	this.GetOrigin = function() { return this.m_Origin;}
+    //@param {vector3} a_Origin
+    this.SetDirection = function (a_Direction) { this.m_Direction = a_Direction; }
 
-	this.GetDirection = function() { return this.m_Direction;}
+    this.GetOrigin = function () { return this.m_Origin; }
 
-	//@param {vector3}
-	var m_Origin = new vector3();
-	//@param {vector3}
-	var m_Direction = new vector3();
+    this.GetDirection = function () { return this.m_Direction; }
+
+    //@param {vector3}
+    var m_Origin = new vector3();
+    //@param {vector3}
+    var m_Direction = new vector3();
 }
 
 // class Engine
-function Engine()
-{
-	//default constructor
-	this.m_Scene = new Scene();
-  this.m_Scene.InitScene();
+function Engine() {
+    //default constructor
+    this.m_Scene = new Scene();
+    this.m_Scene.InitScene();
 
-	//@param {Pixel} a_Dest
-	//@param {int} a_Width a_Height
-	this.SetTarget = function( a_Dest, a_Width, a_Height) 	{	
-																this.m_Dest = a_Dest; 
-																this.m_Width = a_Width; 
-																this.m_Height = a_Height;
-															}
-	// @return {Scene} 
-	this.GetScene = function()  { return this.m_Scene;}
+    //@param {Pixel} a_Dest
+    //@param {int} a_Width a_Height
+    this.SetTarget = function (a_Dest, a_Width, a_Height) {
+        this.m_Dest = a_Dest;
+        this.m_Width = a_Width;
+        this.m_Height = a_Height;
+    }
+    // @return {Scene} 
+    this.GetScene = function () { return this.m_Scene; }
 
-	//@param {Ray} a_Ray
-	//@param {int} a_Depth
-	//@param {float} a_RIndex 
-	//@return[0] {int} normal return
-	//@return[1] {Color} a_Acc 
-	//@return[2] {float} a_Dist
-	this.Raytrace = function( a_Ray, a_Depth, a_RIndex ) 
-	{							
-		var ret = new Array(3);											
-		if(a_Depth > TRACEDEPTH) {ret[0] = 0;return ret;}
+    //@param {Ray} a_Ray
+    //@param {int} a_Depth
+    //@param {float} a_RIndex 
+    //@return[0] {int} normal return
+    //@return[1] {Color} a_Acc 
+    //@return[2] {float} a_Dist
+    this.Raytrace = function (a_Ray, a_Depth, a_RIndex) {
+        var ret = new Array(3);
+        if (a_Depth > TRACEDEPTH) { ret[0] = 0; return ret; }
 
-		//a_Depth = 1000000.0;
-		var a_Dist = 1000000.0;
-		//@param  {vector3}
-		var pi;
-		//@param {Primitive}
-		var prim = 0;
-		//@param {int}
-		var result;
-		
-		for( var s = 0; s < this.m_Scene.GetNrPrimitives(); s++ )
-		{
-			//@param {Primitive}
-			var pr = this.m_Scene.GetPrimitive( s );
-			//console.log("pr is "+pr.toString());
-			//console.log("ray is "+a_Ray.m_Origin.toString()+"  Dir:"+a_Ray.m_Direction.toString());
-			//@param {int}
-			var res;
-			var prReturn = pr.Intersect(a_Ray, a_Dist);
-			
-			if(prReturn[0] != 0)
-			{
-				a_Dist = prReturn[1];
-				ret[2] = a_Dist;
-				//console.log("intersect with pr"+pr.toString());
-				prim = pr;
-				result = res; 
-			}
-		}
+        //a_Depth = 1000000.0;
+        var a_Dist = 1000000.0;
+        //@param  {vector3}
+        var pi;
+        //@param {Primitive}
+        var prim = 0;
+        //@param {int}
+        var result;
 
-		//console.log("prim is "+prim);
-		if (!prim) {ret[0]=0;return ret;};
+        for (var s = 0; s < this.m_Scene.GetNrPrimitives(); s++) {
+            //@param {Primitive}
+            var pr = this.m_Scene.GetPrimitive(s);
+            //console.log("pr is "+pr.toString());
+            //console.log("ray is "+a_Ray.m_Origin.toString()+"  Dir:"+a_Ray.m_Direction.toString());
+            //@param {int}
+            var res;
+            var prReturn = pr.Intersect(a_Ray, a_Dist);
 
-		var a_Acc = new vector3();
-		
-		if (prim.IsLight())
-		{
-			a_Acc = new vector3( 1, 1, 1 );
-		}
-		else
-		{
-			// determine color at point of intersection
-			pi = a_Ray.GetDirection().Mul(a_Dist).Add(a_Ray.GetOrigin());
-			// trace lights
-			for ( var l = 0; l < this.m_Scene.GetNrPrimitives(); l++ )
-			{
-				//@param {Primitive}
-				var p = this.m_Scene.GetPrimitive( l );
-				
-				if (p.IsLight()) 
-				{
-					//@param {Primitive}
-					var light = p;
-					
-					// handle point light source
-					//@param {float}
-					var shade = 1.0;
-					if (light.GetType() == 1)
-					{
-						//@param {vector3}
-						var L = light.GetCentre().Sub(pi);
-						//@param {float}
-						var tdist = LENGTH( L );
-						L = L.Mul( 1.0 / tdist );
-						//@param {Ray}
-						var r = new Ray( pi.Add(L.Mul(EPSILON)), L );
-						for ( var s = 0; s < this.m_Scene.GetNrPrimitives(); s++ )
-						{
-							//@param {Primitive}
-							pr = this.m_Scene.GetPrimitive( s );
-							//if ((pr != light) && (pr.Intersect(r, tdist)))
-							
-							var ret = pr.Intersect(r, tdist);
-							console.log("")
-							if((pr != light) && (ret[0]))
-							{
-								shade = 0;
-								break;
-							}
-						}
-					}
-					if (shade > 0)
-					{
-						// calculate diffuse shading
-						//@param {vector3}
-						var L = light.GetCentre().Sub(pi);
-						L.Normalize();
-						//@param {vector3}
-						var N = prim.GetNormal( pi );
-						if (prim.GetMaterial().GetDiffuse() > 0)
-						{
-							//@param {float}
-							var dot = DOT( N, L );
-							if (dot > 0)
-							{
-								//@param {float}
-								var diff = dot * prim.GetMaterial().GetDiffuse();
-								// add diffuse component to ray color
-								a_Acc = a_Acc.Add( (prim.GetMaterial().GetColor().Mul(light.GetMaterial().GetColor())).Mul(diff)); 
-							}
-						}
-						
-						// determine specular component
-						if(prim.GetMaterial().GetSpecular() > 0)
-						{
-							// @param {vector3}
-							var V = a_Ray.GetDirection();
-							// @param {vector3}
-							var R = L.Sub(N.Mul(2.0 * DOT(L, N)));
-							// @param {float}
-							var dot = DOT(V, R);
-							if(dot > 0)
-							{
-								// @param {float}
-								var spec = Math.pow( dot, 20) * prim.GetMaterial().GetSpecular() * shade;
-							}
-						}
-					} // end of if
-				} // end of if
-			} // end of for loop
-		}
-		// calculate reflection
-		//@param {float}
-		var refl = prim.GetMaterial().GetReflection();
-		if ((refl > 0.0) && (a_Depth < TRACEDEPTH))
-		{
-			//@param {vector3}
-			var N = prim.GetNormal( pi );
-			//var R = a_Ray.GetDirection().Sub((DOT( a_Ray.GetDirection(), N ).Mul(N)).Mul(2.0));
-			var R = a_Ray.GetDirection().Sub(N.Mul(2.0 * DOT(a_Ray.GetDirection(), N)));
-			var rcol = new vector3( 0, 0, 0 );
-			//@param {float}
-			//var dist;
-			var ret = this.Raytrace( new Ray( pi.Add(R.Mul(EPSILON)), R ), a_Depth + 1, a_RIndex);
-			rcol = ret[1];
-			a_Acc = a_Acc.Add(prim.GetMaterial().GetColor().Mul(rcol.Mul(refl)));
-			//a_Acc = a_Acc.Add( refl.Mul(rcol.Mul(prim.GetMaterial().GetColor())));
-		}
-		// calculate refraction
-		//@param {float}
-		var refr = prim.GetMaterial().GetRefraction();
-		if ((refr > 0) && (a_Depth < TRACEDEPTH))
-		{
-			//@param {float}
-			var rindex = prim.GetMaterial().GetRefrIndex();
-			var n = a_RIndex / rindex;
-			//@param {vector3}
-			var N = prim.GetNormal( pi ).Mul(result);
-			//@param {float}
-			var cosI = -DOT( N, a_Ray.GetDirection() );
-			var cosT2 = 1.0 - n * n * (1.0 - cosI * cosI);
-			if (cosT2 > 0.0)
-			{
-				//@param {vector3}
-				var T = (a_Ray.GetDirection().Mul(n)).Add(N.Mul(n * cosI - Math.sqrt( cosT2 )));
-				var rcol = new vector3( 0, 0, 0 );
-				//@param {float}
-				var dist;
-				var ret = this.Raytrace( new Ray( pi.Add(T.Mul(EPSILON)), T ), a_Depth + 1, rindex);
-				rcol = ret[1];
-				dist = ret[2];
-				// apply Beer's law
-				// @param {vector3}
-				var absorbance = (prim.GetMaterial().GetColor().Mul(0.15)).Mul(-dist);
-				var transparancy = new vector3(Math.exp(absorbance.x), Math.exp(absorbance.y), Math.exp(absorbance.z));
-				a_Acc = a_Acc.Add(rcol.Mul(transparancy));
-			}
-		}
-		console.log("Color in Raytrace "+a_Acc.toString());
-		ret[0] = prim;
-		ret[1] = a_Acc;
-		ret[2] = a_Dist;
-		return ret;
-	}
-	
-	this.InitRender = function()	
-	{
-		this.m_CurrLine = 20;
-		this.m_PPos = this.m_CurrLine * this.m_Width;
-		this.m_WX1 = -4, this.m_WX2 = 4, this.m_WY1 = this.m_SY = 3, this.m_WY2 = -3;
-		this.m_DX = (this.m_WX2 - this.m_WX1) / this.m_Width;
-		this.m_DY = (this.m_WY2 - this.m_WY1) / this.m_Height;
-		this.m_SY += this.m_CurrLine * this.m_DY;
-		this.m_LastRow = new Primitive*[this.m_Width];
-		for( var i = 0; i < this.m_Width * 4; i++)
-			this.m_LastRow[i] = 0;
-	}
-	
-	this.Render = function(imageData)
-	{
-		//@param {vector3}
-		var o = new vector3( 0, 0, -5 );
-		//@param {int}
-		var date = new Date();
-		var msecs = date.getTime();
-		//@param {Primitive}
-		var lastprim = 0;
-		// render remaining lines
-		for ( var y = this.m_CurrLine; y < (this.m_Height - 20); y++ )
-		{
-			//console.log("currLine="+this.m_CurrLine+" y="+y+" Height="+this.m_Height);
-			this.m_SX = this.m_WX1;
-			// render pixels for current line
-			for ( var x = 0; x < this.m_Width; x++ )
-			{
-				//@param {vector3}
-				var acc = new vector3( 0, 0, 0 );
-				//@param {vector3}
-				var dir = new vector3( this.m_SX, this.m_SY, 0 ).Sub(o);
-				var nDir = NORMALIZE( dir );
-				//@param {Ray}
-				var r = new Ray( o, nDir );
-        
-				//@param {float}
-				var dist;
-				//@param {Primitive}
-				var ret = this.Raytrace( r, 1, 1.0 );
-				prim = ret[0];
-				
-				if(prim != 0)
-				{
-					acc = ret[1];
-					//console.log("Ray acc"+ acc.toString());
-					dist = ret[2];
-				}
-				
-				//@param {int}
-				var red;
-				var green;
-				var blue;
-			
-				if(prim != lastprim)
-				{
-					lastprim = prim;
-					//@param {vector3}
-					var acc = new vector3( 0, 0, 0 );
-					for ( var tx = -1; tx < 2; tx++ ) for ( var ty = -1; ty < 2; ty++ )
-					{
-						//@param {vector3}
-						var dir = new vector3( this.m_SX + this.m_DX * tx / 2.0, this.m_SY + this.m_DY * ty / 2.0, 0 ).Sub(o);
-						var n_Dir = NORMALIZE( dir );
-						//@param {Ray}
-						var r = new Ray( o, n_Dir );
-						//@param {float}
-						var dist;
-						//@param {Primitive}
-						var prim = this.Raytrace( r, 1, 1.0);
-					}
-					red = acc.x * (256 / 9);
-					green = acc.y * (256 / 9);
-					blue = acc.z * (256 / 9);
-				}
-				else
-				{
-					red = acc.x * 256;
-					green = acc.y * 256;
-					blue = acc.z * 256;
-				}
-				if (red > 255) red = 255;
-				if (green > 255) green = 255;
-				if (blue > 255) blue = 255;
-				
-				var cc = new Color( red, green, blue);
-				//console.log("X:"+x+" y:"+y+" col"+cc.toString);
-				setPixel(imageData, x, y, cc);
-				this.m_SX += this.m_DX;
-			}
-			this.m_SY += this.m_DY;
-			if ((date.getTime() - msecs) > 100) 
-			{
-				// return control to windows so the screen gets updated
-				this.m_CurrLine = y + 1;
-				return false;
-			}
-			//var t = setTimeout("addOne( this.m_CurrLine)",100);
-		}
-		return true;
-	}
+            if (prReturn[0] != 0) {
+                a_Dist = prReturn[1];
+                ret[2] = a_Dist;
+                //console.log("intersect with pr"+pr.toString());
+                prim = pr;
+                result = res;
+            }
+        }
+
+        //console.log("prim is "+prim);
+        if (!prim) { ret[0] = 0; return ret; };
+
+        var a_Acc = new vector3();
+
+        if (prim.IsLight()) {
+            a_Acc = new vector3(1, 1, 1);
+        }
+        else {
+            // determine color at point of intersection
+            pi = a_Ray.GetDirection().Mul(a_Dist).Add(a_Ray.GetOrigin());
+            // trace lights
+            for (var l = 0; l < this.m_Scene.GetNrPrimitives(); l++) {
+                //@param {Primitive}
+                var p = this.m_Scene.GetPrimitive(l);
+
+                if (p.IsLight()) {
+                    //@param {Primitive}
+                    var light = p;
+
+                    // handle point light source
+                    //@param {float}
+                    var shade = 1.0;
+                    if (light.GetType() == 1) {
+                        //@param {vector3}
+                        var L = light.GetCentre().Sub(pi);
+                        //@param {float}
+                        var tdist = LENGTH(L);
+                        L = L.Mul(1.0 / tdist);
+                        //@param {Ray}
+                        var r = new Ray(pi.Add(L.Mul(EPSILON)), L);
+                        for (var s = 0; s < this.m_Scene.GetNrPrimitives(); s++) {
+                            //@param {Primitive}
+                            pr = this.m_Scene.GetPrimitive(s);
+                            //if ((pr != light) && (pr.Intersect(r, tdist)))
+
+                            var ret = pr.Intersect(r);
+
+                            if ((pr != light) && (ret[0])) {
+                                shade = 0;
+                                break;
+                            }
+                        }
+                    }
+                    if (shade > 0) {
+                        // calculate diffuse shading
+                        //@param {vector3}
+                        var L = light.GetCentre().Sub(pi);
+                        L.Normalize();
+                        //@param {vector3}
+                        var N = prim.GetNormal(pi);
+                        if (prim.GetMaterial().GetDiffuse() > 0) {
+                            //@param {float}
+                            var dot = DOT(N, L);
+                            if (dot > 0) {
+                                //@param {float}
+                                var diff = dot * prim.GetMaterial().GetDiffuse();
+                                // add diffuse component to ray color
+                                a_Acc = a_Acc.Add((prim.GetMaterial().GetColor().Mul(light.GetMaterial().GetColor())).Mul(diff));
+                            }
+                        }
+
+                        // determine specular component
+                        if (prim.GetMaterial().GetSpecular() > 0) {
+                            // @param {vector3}
+                            var V = a_Ray.GetDirection();
+                            // @param {vector3}
+                            var R = L.Sub(N.Mul(2.0 * DOT(L, N)));
+                            // @param {float}
+                            var dot = DOT(V, R);
+                            if (dot > 0) {
+                                // @param {float}
+                                var spec = Math.pow(dot, 20) * prim.GetMaterial().GetSpecular() * shade;
+                            }
+                        }
+                    } // end of if
+                } // end of if
+            } // end of for loop
+        }
+        // calculate reflection
+        //@param {float}
+        var refl = prim.GetMaterial().GetReflection();
+        if ((refl > 0.0) && (a_Depth < TRACEDEPTH)) {
+            //@param {vector3}
+            var N = prim.GetNormal(pi);
+            //var R = a_Ray.GetDirection().Sub((DOT( a_Ray.GetDirection(), N ).Mul(N)).Mul(2.0));
+            var R = a_Ray.GetDirection().Sub(N.Mul(2.0 * DOT(a_Ray.GetDirection(), N)));
+            var rcol = new vector3(0, 0, 0);
+            //@param {float}
+            //var dist;
+            var ret = this.Raytrace(new Ray(pi.Add(R.Mul(EPSILON)), R), a_Depth + 1, a_RIndex);
+            rcol = ret[1];
+            a_Acc = a_Acc.Add(prim.GetMaterial().GetColor().Mul(rcol.Mul(refl)));
+            //a_Acc = a_Acc.Add( refl.Mul(rcol.Mul(prim.GetMaterial().GetColor())));
+        }
+        // calculate refraction
+        //@param {float}
+        var refr = prim.GetMaterial().GetRefraction();
+        if ((refr > 0) && (a_Depth < TRACEDEPTH)) {
+            //@param {float}
+            var rindex = prim.GetMaterial().GetRefrIndex();
+            var n = a_RIndex / rindex;
+            //@param {vector3}
+            var N = prim.GetNormal(pi).Mul(result);
+            //@param {float}
+            var cosI = -DOT(N, a_Ray.GetDirection());
+            var cosT2 = 1.0 - n * n * (1.0 - cosI * cosI);
+            if (cosT2 > 0.0) {
+                //@param {vector3}
+                var T = (a_Ray.GetDirection().Mul(n)).Add(N.Mul(n * cosI - Math.sqrt(cosT2)));
+                var rcol = new vector3(0, 0, 0);
+                //@param {float}
+                var dist;
+                var ret = this.Raytrace(new Ray(pi.Add(T.Mul(EPSILON)), T), a_Depth + 1, rindex);
+                rcol = ret[1];
+                dist = ret[2];
+                // apply Beer's law
+                // @param {vector3}
+                var absorbance = (prim.GetMaterial().GetColor().Mul(0.15)).Mul(-dist);
+                var transparancy = new vector3(Math.exp(absorbance.x), Math.exp(absorbance.y), Math.exp(absorbance.z));
+                a_Acc = a_Acc.Add(rcol.Mul(transparancy));
+            }
+        }
+        console.log("Color in Raytrace " + a_Acc.toString());
+        ret[0] = prim;
+        ret[1] = a_Acc;
+        ret[2] = a_Dist;
+        return ret;
+    }
+
+    this.InitRender = function () {
+        this.m_CurrLine = 20;
+        this.m_PPos = this.m_CurrLine * this.m_Width;
+        this.m_WX1 = -4, this.m_WX2 = 4, this.m_WY1 = this.m_SY = 3, this.m_WY2 = -3;
+        this.m_DX = (this.m_WX2 - this.m_WX1) / this.m_Width;
+        this.m_DY = (this.m_WY2 - this.m_WY1) / this.m_Height;
+        this.m_SY += this.m_CurrLine * this.m_DY;
+        this.m_LastRow = new Primitive * [this.m_Width];
+        for (var i = 0; i < this.m_Width * 4; i++)
+            this.m_LastRow[i] = 0;
+    }
+
+    this.Render = function (imageData) {
+        //@param {vector3}
+        var o = new vector3(0, 0, -5);
+        //@param {int}
+        var date = new Date();
+        var msecs = date.getTime();
+        //@param {Primitive}
+        var lastprim = 0;
+        // render remaining lines
+        for (var y = this.m_CurrLine; y < (this.m_Height - 20); y++) {
+            //console.log("currLine="+this.m_CurrLine+" y="+y+" Height="+this.m_Height);
+            this.m_SX = this.m_WX1;
+            // render pixels for current line
+            for (var x = 0; x < this.m_Width; x++) {
+                //@param {vector3}
+                var acc = new vector3(0, 0, 0);
+                //@param {vector3}
+                var dir = new vector3(this.m_SX, this.m_SY, 0).Sub(o);
+                var nDir = NORMALIZE(dir);
+                //@param {Ray}
+                var r = new Ray(o, nDir);
+
+                //@param {float}
+                var dist;
+                //@param {Primitive}
+                var ret = this.Raytrace(r, 1, 1.0);
+                prim = ret[0];
+
+                if (prim != 0) {
+                    acc = ret[1];
+                    //console.log("Ray acc"+ acc.toString());
+                    dist = ret[2];
+                }
+
+                //@param {int}
+                var red;
+                var green;
+                var blue;
+
+                if (prim != lastprim) {
+                    lastprim = prim;
+                    //@param {vector3}
+                    var acc = new vector3(0, 0, 0);
+                    for (var tx = -1; tx < 2; tx++) for (var ty = -1; ty < 2; ty++) {
+                        //@param {vector3}
+                        var dir = new vector3(this.m_SX + this.m_DX * tx / 2.0, this.m_SY + this.m_DY * ty / 2.0, 0).Sub(o);
+                        var n_Dir = NORMALIZE(dir);
+                        //@param {Ray}
+                        var r = new Ray(o, n_Dir);
+                        //@param {float}
+                        var dist;
+                        //@param {Primitive}
+                        var prim = this.Raytrace(r, 1, 1.0);
+                    }
+                    red = acc.x * (256 / 9);
+                    green = acc.y * (256 / 9);
+                    blue = acc.z * (256 / 9);
+                }
+                else {
+                    red = acc.x * 256;
+                    green = acc.y * 256;
+                    blue = acc.z * 256;
+                }
+                if (red > 255) red = 255;
+                if (green > 255) green = 255;
+                if (blue > 255) blue = 255;
+
+                var cc = new Color(red, green, blue);
+                //console.log("X:"+x+" y:"+y+" col"+cc.toString);
+                setPixel(imageData, x, y, cc);
+                this.m_SX += this.m_DX;
+            }
+            this.m_SY += this.m_DY;
+            if ((date.getTime() - msecs) > 100) {
+                // return control to windows so the screen gets updated
+                this.m_CurrLine = y + 1;
+                return false;
+            }
+            //var t = setTimeout("addOne( this.m_CurrLine)",100);
+        }
+        return true;
+    }
     //@param {float}
     var m_WX1, m_WY1, m_WX2, m_WY2, m_DX, m_DY, m_SX, m_SY;
     //@param {Scene}
