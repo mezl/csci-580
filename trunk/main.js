@@ -39,18 +39,24 @@ function main()
       setPixel(imageData,i,j,GRAY);
     }
   }
-    animate();
+  animate();
 }
+var totalTime = 0;
 function animate(){
+  var date = new Date();
+	var ms = date.getTime();
   if(!Engine.Render(imageData))
   {
+    date = new Date();
+    var eachRenderTime = date.getTime() - ms;
+    totalTime+=eachRenderTime;
     context.putImageData(imageData,0,0);
     // request new frame
     animateRequest = requestAnimFrame(function(){
         animate();
     });
   }else{
-    console.log("Render Done");
+    console.log("Render Done. Total takes "+totalTime/1000.0+" sec");
     cancelRequestAnimFrame(animateRequest);
   }
 
