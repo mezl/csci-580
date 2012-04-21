@@ -499,7 +499,7 @@ function Engine()
 			{
         a_Dist = prReturn[1];
         ret[2] = a_Dist;
-        console.log("intersect with pr"+pr.toString());
+        //console.log("intersect with pr"+pr.toString());
 				prim = pr;
 				result = res; 
 			}
@@ -508,9 +508,10 @@ function Engine()
     //console.log("prim is "+prim);
 		if (!prim) {ret[0]=0;return ret;};
 
+    var a_Acc = new vector3();
 		if (prim.IsLight())
 		{
-			var a_Acc = new vector3( 1, 1, 1 );
+			a_Acc = new vector3( 1, 1, 1 );
 		}
 		else
 		{
@@ -539,13 +540,13 @@ function Engine()
 							//@param {float}
 							var diff = dot * prim.GetMaterial().GetDiffuse();
 							// add diffuse component to ray color
-							a_Acc = a_Acc.Add( ( prim.GetMaterial().GetColor().Mul(light.GetMaterial().GetColor())).Mul(diff)); 
+							a_Acc = a_Acc.Add( (prim.GetMaterial().GetColor().Mul(light.GetMaterial().GetColor())).Mul(diff)); 
 						}
 					}
 				}
 			}
 		}
-    console.log("Color in Raytrace "+a_Acc.toString);
+    //console.log("Color in Raytrace "+a_Acc.toString());
     ret[0] = prim;
     ret[1] = a_Acc;
     ret[2] = a_Dist;
@@ -601,18 +602,19 @@ function Engine()
         prim = ret[0];
         if(prim != 0){
           acc = ret[1];
+          //console.log("Ray acc"+ acc.toString());
           dist = ret[2];
         }
 				//@param {int}
-				var red = acc.r * 256;
-				var green = acc.g * 256;
-				var blue = acc.b * 256;
+				var red = acc.x * 256;
+				var green = acc.y * 256;
+				var blue = acc.z * 256;
 			
 				if (red > 255) red = 255;
 				if (green > 255) green = 255;
 				if (blue > 255) blue = 255;
 				
-				var cc = new vector3( red, green, blue);
+				var cc = new Color( red, green, blue);
         //console.log("X:"+x+" y:"+y+" col"+cc.toString);
 				setPixel(imageData, x, y, cc);
 				this.m_SX += this.m_DX;
