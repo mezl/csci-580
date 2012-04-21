@@ -24,7 +24,7 @@ function Color(r,g,b)
 
 }
 
-//testCommon();//All test passed
+testCommon();//All test passed
 //#############################################################################
 //code testing
 function testCommon()
@@ -50,10 +50,10 @@ function testCommon()
 	console.log("Test A.Length() "+A.Length()+" == sqrt(3)");
 	console.log("Test A.SqrLength() "+A.SqrLength()+" == 3");
 	console.log("Test A.Cross(B) "+A.Cross(B).toString()+" == 0");
-	A.Add(B);
-	console.log("Test A.Add(B) "+A.toString()+" == (3,3,3)");
-	A.Sub(B);
-	console.log("Test A.Sub(B) "+A.toString()+" == (1,1,1)");
+	var AB =A.Add(B);
+	console.log("Test A.Add(B) "+AB.toString()+" == (3,3,3)");
+	AB =A.Sub(B);
+	console.log("Test A.Sub(B) "+AB.toString()+" == (1,1,1)");
 	A.Mul(4);
 	console.log("Test A.Mul(4) "+A.toString()+" == (4,4,4)");
 	A.Mul(new vector3(5,5,5));
