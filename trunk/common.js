@@ -4,26 +4,6 @@
 // Author: Yun-Yu Chen,Sophia Chang,Vince Liao,Chin-Kai Chang
 // -----------------------------------------------------------
 
-window.requestAnimFrame = (function(callback){
-    return window.requestAnimationFrame ||
-    window.webkitRequestAnimationFrame ||
-    window.mozRequestAnimationFrame ||
-    window.oRequestAnimationFrame ||
-    window.msRequestAnimationFrame ||
-    function(callback){
-        window.setTimeout(callback, 1000 / 1);
-		
-    };
-})();
-window.cancelRequestAnimFrame = ( function() {
-    return window.cancelAnimationFrame          ||
-        window.webkitCancelRequestAnimationFrame    ||
-        window.mozCancelRequestAnimationFrame       ||
-        window.oCancelRequestAnimationFrame     ||
-        window.msCancelRequestAnimationFrame        ||
-        clearTimeout
-} )();
-
 //typedef unsigned int Pixel;no need type in js
 //typedef vector3 Color;
 //#############################################################################
@@ -32,7 +12,6 @@ var BLACK = new Color(0,0,0);
 var GREEN = new Color(0,255,0);
 var BLUE  = new Color(0,0,255);
 var RED   = new Color(255,0,0);
-var GRAY  = new Color(128,128,128);
 //#############################################################################
 function Color(r,g,b)
 {
@@ -45,7 +24,7 @@ function Color(r,g,b)
 
 }
 
-//testCommon();//All test passed
+testCommon();//All test passed
 //#############################################################################
 //code testing
 function testCommon()
