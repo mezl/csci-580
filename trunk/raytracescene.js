@@ -691,7 +691,7 @@ function Engine()
 				a_Acc = a_Acc.Add(rcol.Mul(transparancy));
 			}
 		}
-		console.log("Color in Raytrace "+a_Acc.toString());
+		//console.log("Color in Raytrace "+a_Acc.toString());
 		ret[0] = prim;
 		ret[1] = a_Acc;
 		ret[2] = a_Dist;
@@ -791,6 +791,7 @@ function Engine()
 				this.m_SX += this.m_DX;
 			}
 			this.m_SY += this.m_DY;
+      date = new Date();
 			if ((date.getTime() - msecs) > 100) 
 			{
 				// return control to windows so the screen gets updated
