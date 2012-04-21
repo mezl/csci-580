@@ -526,7 +526,7 @@ function Engine() {
                                 break;
                             }
                         }
-                        console.log("shade = " + shade);
+                        //console.log("shade = " + shade);
                     }
                     if (shade > 0) {
                         console.log("shade");
@@ -696,12 +696,13 @@ function Engine() {
                 this.m_SX += this.m_DX;
             }
             this.m_SY += this.m_DY;
-            if ((/*GetTickCount()*/date.getTime() - msecs) > 100) {
-                // return control to windows so the screen gets updated
-                this.m_CurrLine = y + 1;
-                return false;
-            }
-            //var t = setTimeout("addOne( this.m_CurrLine)",100);
+	    date = new Date();
+	    if ((date.getTime() - msecs) > 100) 
+	    {
+		    // return control to windows so the screen gets updated
+		    this.m_CurrLine = y + 1;
+		    return false;
+	    }
         }
         return true;
     }
