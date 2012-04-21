@@ -203,6 +203,41 @@ function Sphere(a_Centre, a_Radius) {
     this.GetSqRadius = function () { return this.m_SqRadius; }
 
     // @param {Ray} a_Ray
+    // @param {float} a_Dist
+    // @return {Array} [0] intersection type [1] a_Dist
+    this.Intersect = function (a_Ray, a_Dist) {
+        var result = new Array(2);
+        var v = a_Ray.GetOrigin().Sub(this.m_Centre);
+        var b = -DOT(v, a_Ray.GetDirection());
+        var det = (b * b) - DOT(v, v) + this.m_SqRadius;
+        var retval = MISS;
+        if (det > 0) {
+            det = Math.sqrt(det);
+            var i1 = b - det;
+            var i2 = b + det;
+            if (i2 > 0) {
+                if (i1 < 0) {
+                    if (i2 < a_Dist) {
+                        a_Dist = i2;
+                        retval = INPRIM;
+                    }
+                }
+                else {
+                    if (i1 < a_Dist) {
+                        a_Dist = i1;
+                        retval = HIT;
+                    }
+                }
+            }
+        }
+        result[0] = retval;
+        result[1] = a_Dist;
+
+        return result;
+    }
+    
+    /*
+    // @param {Ray} a_Ray
     // @return {Array} [0] intersection type [1] distance
     this.Intersect = function (a_Ray) {
         var result = new Array(2);
@@ -234,7 +269,7 @@ function Sphere(a_Centre, a_Radius) {
         result[1] = a_Dist;
 
         return result;
-    }
+    }*/
 
     // @param {vector3} a_Pos
     // @return {vector3} normal
@@ -274,6 +309,29 @@ function PlanePrim(a_Normal, a_D) {
     this.GetD = function () { return this.m_Plane.D; }
 
     // @param {Ray} a_Ray
+    // @param {float} a_Dist
+    // @return {Array} [0] intersection type [1] a_Dist
+    this.Intersect = function (a_Ray, a_Dist) {
+        var result = new Array(2);
+        var retval = MISS;
+        var d = DOT(this.m_Plane.N, a_Ray.GetDirection());
+        if (d != 0) {
+            var dist = -(DOT(this.m_Plane.N, a_Ray.GetOrigin()) + this.m_Plane.D) / d;
+            if (dist > 0) {
+                if (dist < a_Dist) {
+                    a_Dist = dist;
+                    retval = HIT;
+                }
+            }
+        }
+
+        result[0] = retval;
+        result[1] = a_Dist;
+        return result;
+    }
+    
+    /*
+    // @param {Ray} a_Ray
     // @return {Array} [0] intersection type [1] distance
     this.Intersect = function (a_Ray) {
         var result = new Array(2);
@@ -295,7 +353,7 @@ function PlanePrim(a_Normal, a_D) {
         result[0] = retval;
         result[1] = a_Dist;
         return result;
-    }
+    }*/
 
     // @param {vector3} a_Pos
     // @return {vector3} normal
@@ -466,8 +524,8 @@ function Engine()
 		var ret = new Array(3);											
 		if(a_Depth > TRACEDEPTH) {ret[0] = 0;return ret;}
 
-		a_Depth = 1000000.0;
-		var a_Dist = 0;
+		//a_Depth = 1000000.0;
+		var a_Dist = 1000000.0;
 		//@param  {vector3}
 		var pi;
 		//@param {Primitive}
@@ -483,7 +541,8 @@ function Engine()
 			//console.log("ray is "+a_Ray.m_Origin.toString()+"  Dir:"+a_Ray.m_Direction.toString());
 			//@param {int}
 			var res;
-			var prReturn = pr.Intersect(a_Ray);
+			var prReturn = pr.Intersect(a_Ray, a_Dist);
+			
 			if(prReturn[0] != 0)
 			{
 				a_Dist = prReturn[1];
@@ -517,30 +576,35 @@ function Engine()
 				{
 					//@param {Primitive}
 					var light = p;
+					
 					// handle point light source
 					//@param {float}
 					var shade = 1.0;
-					if (light.GetType() == 1)	
+					if (light.GetType() == 1)
 					{
 						//@param {vector3}
 						var L = light.GetCentre().Sub(pi);
 						//@param {float}
 						var tdist = LENGTH( L );
-						L = L.Mul(1.0/tdist);
+						L = L.Mul( 1.0 / tdist );
 						//@param {Ray}
 						var r = new Ray( pi.Add(L.Mul(EPSILON)), L );
 						for ( var s = 0; s < this.m_Scene.GetNrPrimitives(); s++ )
 						{
 							//@param {Primitive}
 							pr = this.m_Scene.GetPrimitive( s );
-							if ((pr != light) && (pr.Intersect(r)))
+							//if ((pr != light) && (pr.Intersect(r, tdist)))
+							
+							var ret = pr.Intersect(r, tdist);
+							console.log("")
+							if((pr != light) && (ret[0]))
 							{
 								shade = 0;
 								break;
 							}
 						}
 					}
-					/*if (shade > 0)
+					if (shade > 0)
 					{
 						// calculate diffuse shading
 						//@param {vector3}
@@ -560,28 +624,25 @@ function Engine()
 								a_Acc = a_Acc.Add( (prim.GetMaterial().GetColor().Mul(light.GetMaterial().GetColor())).Mul(diff)); 
 							}
 						}
-					}//*/						
-					// calculate diffuse shading
-					//@param {vector3}
-					var L = light.GetCentre().Sub(pi);
-					L.Normalize();
-					//@param {vector3}
-					var N = prim.GetNormal( pi );
-					if (prim.GetMaterial().GetDiffuse() > 0)
-					{
-						//@param {float}
-						var dot = DOT( N, L );
-						if (dot > 0)
+						
+						// determine specular component
+						if(prim.GetMaterial().GetSpecular() > 0)
 						{
-							//@param {float}
-							var diff = dot * prim.GetMaterial().GetDiffuse();
-							// add diffuse component to ray color
-							a_Acc = a_Acc.Add( (prim.GetMaterial().GetColor().Mul(light.GetMaterial().GetColor())).Mul(diff)); 
+							// @param {vector3}
+							var V = a_Ray.GetDirection();
+							// @param {vector3}
+							var R = L.Sub(N.Mul(2.0 * DOT(L, N)));
+							// @param {float}
+							var dot = DOT(V, R);
+							if(dot > 0)
+							{
+								// @param {float}
+								var spec = Math.pow( dot, 20) * prim.GetMaterial().GetSpecular() * shade;
+							}
 						}
-					}//*/
-
-				}				
-			}
+					} // end of if
+				} // end of if
+			} // end of for loop
 		}
 		// calculate reflection
 		//@param {float}
@@ -590,12 +651,15 @@ function Engine()
 		{
 			//@param {vector3}
 			var N = prim.GetNormal( pi );
-			var R = a_Ray.GetDirection().Sub((DOT( a_Ray.GetDirection(), N ).Mul(N)).Mul(2.0));
+			//var R = a_Ray.GetDirection().Sub((DOT( a_Ray.GetDirection(), N ).Mul(N)).Mul(2.0));
+			var R = a_Ray.GetDirection().Sub(N.Mul(2.0 * DOT(a_Ray.GetDirection(), N)));
 			var rcol = new vector3( 0, 0, 0 );
 			//@param {float}
-			var dist;
-			Raytrace( Ray( pi.Add(R.Mul(EPSILON)), R ), a_Depth + 1, a_RIndex);
-			a_Acc = a_Acc.Add( refl.Mul(rcol.Mul(prim.GetMaterial().GetColor())));
+			//var dist;
+			var ret = this.Raytrace( new Ray( pi.Add(R.Mul(EPSILON)), R ), a_Depth + 1, a_RIndex);
+			rcol = ret[1];
+			a_Acc = a_Acc.Add(prim.GetMaterial().GetColor().Mul(rcol.Mul(refl)));
+			//a_Acc = a_Acc.Add( refl.Mul(rcol.Mul(prim.GetMaterial().GetColor())));
 		}
 		// calculate refraction
 		//@param {float}
@@ -606,26 +670,28 @@ function Engine()
 			var rindex = prim.GetMaterial().GetRefrIndex();
 			var n = a_RIndex / rindex;
 			//@param {vector3}
-			N = prim.GetNormal( pi ).Mul(result);
+			var N = prim.GetNormal( pi ).Mul(result);
 			//@param {float}
 			var cosI = -DOT( N, a_Ray.GetDirection() );
 			var cosT2 = 1.0 - n * n * (1.0 - cosI * cosI);
 			if (cosT2 > 0.0)
 			{
 				//@param {vector3}
-				var T = (a_Ray.GetDirection().Mul(n)).Add(N.Mul(n * cosI - sqrtf( cosT2 )));
+				var T = (a_Ray.GetDirection().Mul(n)).Add(N.Mul(n * cosI - Math.sqrt( cosT2 )));
 				var rcol = new vector3( 0, 0, 0 );
 				//@param {float}
 				var dist;
-				Raytrace( Ray( pi.Ass(T.Mul(EPSILON)), T ), a_Depth + 1, rindex);
+				var ret = this.Raytrace( new Ray( pi.Add(T.Mul(EPSILON)), T ), a_Depth + 1, rindex);
+				rcol = ret[1];
+				dist = ret[2];
 				// apply Beer's law
-				//Color absorbance = prim->GetMaterial()->GetColor() * 0.15f * -dist;
-				//Color transparency = Color( expf( absorbance.r ), expf( absorbance.g ), expf( absorbance.b ) );
-				//a_Acc += rcol * transparency;
-				a_Acc = a_Acc.Add( refr.Mul(rcol.Mul(prim.GetMaterial().GetColor())));
+				// @param {vector3}
+				var absorbance = (prim.GetMaterial().GetColor().Mul(0.15)).Mul(-dist);
+				var transparancy = new vector3(Math.exp(absorbance.x), Math.exp(absorbance.y), Math.exp(absorbance.z));
+				a_Acc = a_Acc.Add(rcol.Mul(transparancy));
 			}
 		}
-		//console.log("Color in Raytrace "+a_Acc.toString());
+		console.log("Color in Raytrace "+a_Acc.toString());
 		ret[0] = prim;
 		ret[1] = a_Acc;
 		ret[2] = a_Dist;
@@ -651,7 +717,7 @@ function Engine()
 		var o = new vector3( 0, 0, -5 );
 		//@param {int}
 		var date = new Date();
-		var msecs = date.getTime();//new GetTickCount();
+		var msecs = date.getTime();
 		//@param {Primitive}
 		var lastprim = 0;
 		// render remaining lines
@@ -725,7 +791,7 @@ function Engine()
 				this.m_SX += this.m_DX;
 			}
 			this.m_SY += this.m_DY;
-			if ((/*GetTickCount()*/date.getTime() - msecs) > 100) 
+			if ((date.getTime() - msecs) > 100) 
 			{
 				// return control to windows so the screen gets updated
 				this.m_CurrLine = y + 1;
