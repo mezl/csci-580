@@ -104,7 +104,7 @@ function Material() {
     this.toString = function () {
         return "[ Material Color: " + this.m_color.toString() + " Refl: " + this.m_Refl
 		+ " Refr: " + this.m_Refr + " Diff: " + this.m_Diff
-		+ " Spec: " + this.m_Spec + "RIndex: " + this.m_RIndex + " ]";
+		+ " Spec: " + this.m_Spec + " RIndex: " + this.m_RIndex + " ]";
     }
 }
 
@@ -118,13 +118,13 @@ function Primitive() {
     // default constructor
     this.m_Name = 0;
     this.m_Light = new Boolean(false);
-    this.m_Material = new Material();
+    //this.m_Material = new Material();
 
     // @return {Material} material of this primitive
-    this.GetMaterial = function () { return this.m_Material; }
+    //this.GetMaterial = function () { return this.m_Material; }
 
     // @param {Material} a_Mat
-    this.SetMaterial = function (a_Mat) { this.m_Material = a_Mat; }
+    //this.SetMaterial = function (a_Mat) { this.m_Material = a_Mat; }
 
     // @return {int} type of this primitive
     this.GetType = function () { return 0; }
@@ -155,12 +155,12 @@ function Primitive() {
 
     // @return {String}
     this.toString = function () {
-        return "[ Primitive Name: " + this.m_Name + " Material: " + this.m_Material.toString()
+        return "[ Primitive Name: " + this.m_Name /*+ " Material: " + this.m_Material.toString()*/
 		+ " Type: " + this.GetType() + " Normal: " + this.GetNormal(new vector3(0, 0, 0)).toString()
 		+ " Light: " + this.IsLight().toString() + " ]";
     }
     this.primToString = function () {
-        return "[ Primitive Name: " + this.m_Name + " Material: " + this.m_Material.toString()
+        return "[ Primitive Name: " + this.m_Name /*+ " Material: " + this.m_Material.toString()*/
 		+ " Type: " + this.GetType() + " Normal: " + this.GetNormal(new vector3(0, 0, 0)).toString()
 		+ " Light: " + this.IsLight().toString() + " ]";
     }
@@ -188,12 +188,14 @@ function Sphere(a_Centre, a_Radius) {
         this.m_SqRadius = 1.0 * 1.0;
         this.m_Radius = 1.0;
         this.m_RRadius = 1.0 / 1.0;
+        this.m_Material = new Material();
     } else {
         // constructor
         this.m_Centre = a_Centre;
         this.m_SqRadius = a_Radius * a_Radius;
         this.m_Radius = a_Radius;
         this.m_RRadius = 1.0 / a_Radius;
+        this.m_Material = new Material();
     }
 
     // @return {vertor3} centre of this sphere
@@ -275,6 +277,14 @@ function Sphere(a_Centre, a_Radius) {
     // @return {vector3} normal
     this.GetNormal = function (a_Pos) { return (a_Pos.Sub(this.m_Centre)).Mul(this.m_RRadius); }
 
+    
+
+    // @return {Material} material of this primitive
+    this.GetMaterial = function () { return this.m_Material; }
+
+    // @param {Material} a_Mat
+    this.SetMaterial = function (a_Mat) { this.m_Material = a_Mat; }
+    
     this.toString = function () {
         return "[ Sphere Primitive: " + this.primToString() + " Centre: " + this.m_Centre.toString() + " SqRadius: " + this.m_SqRadius
 		+ " Radius: " + this.m_Radius + " RRadius: " + this.m_RRadius + " ]";
@@ -298,9 +308,11 @@ function PlanePrim(a_Normal, a_D) {
     if (typeof (a_Normal) == "undefined") {
         // default constructor
         this.m_Plane = new plane(new vector3(0, 1, 0), 1.0);
+        this.m_Material = new Material();
     } else {
         //constructor
         this.m_Plane = new plane(a_Normal, a_D);
+        this.m_Material = new Material();
     }
     // @return {vector3} normal of this planeprim
     this.GetNormal = function () { return this.m_Plane.N; }
@@ -359,6 +371,12 @@ function PlanePrim(a_Normal, a_D) {
     // @return {vector3} normal
     this.GetNormal = function (a_Pos) { return this.m_Plane.N; }
 
+    // @return {Material} material of this primitive
+    this.GetMaterial = function () { return this.m_Material; }
+
+    // @param {Material} a_Mat
+    this.SetMaterial = function (a_Mat) { this.m_Material = a_Mat; }
+    
     this.toString = function () {
         return "[ PlanePrim Primitive: " + this.primToString() + " Normal: "
 		+ this.GetNormal().toString() + " D: " + this.GetD() + " ]";
@@ -387,7 +405,7 @@ function Scene() {
         this.m_Primitive[0].GetMaterial().SetDiffuse(1);
         this.m_Primitive[0].GetMaterial().SetColor(new vector3(0.4, 0.3, 0.3));
         // big sphere
-        this.m_Primitive[1] = new Sphere(new vector3(2, -0.8, 3), 2.5);
+        this.m_Primitive[1] = new Sphere(new vector3(2, 0.8, 3), 2.5);
         this.m_Primitive[1].SetName("big sphere");
         this.m_Primitive[1].GetMaterial().SetReflection(0.2);
         this.m_Primitive[1].GetMaterial().SetRefraction(0.8);
@@ -404,7 +422,7 @@ function Scene() {
         // light source 1
         this.m_Primitive[3] = new Sphere(new vector3(0, 5, 5), 0.1);
         this.m_Primitive[3].Light(new Boolean(true));
-        this.m_Primitive[3].GetMaterial().SetColor(new vector3(0.6, 0.6, 0.8));
+        this.m_Primitive[3].GetMaterial().SetColor(new vector3(0.4, 0.4, 0.4));
         // light source 2
         this.m_Primitive[4] = new Sphere(new vector3(-3, 5, 1), 0.1);
         this.m_Primitive[4].Light(new Boolean(true));
@@ -433,8 +451,8 @@ function Scene() {
         this.m_Primitive[7].GetMaterial().SetColor(new vector3(0.4, 0.7, 0.7));
         //grid
         var prim = 8;
-        for (x = 0; x < 8; x = x + 1) {
-            for (y = 0; y < 7; y = y + 1) {
+        for (x = 0; x < 8; x++) {
+            for (y = 0; y < 7; y++) {
                 this.m_Primitive[prim] = new Sphere(new vector3(-4.5 + x * 1.5, -4.3 + y * 1.5, 10), 0.3);
                 this.m_Primitive[prim].SetName("grid sphere");
                 this.m_Primitive[prim].GetMaterial().SetReflection(0);
@@ -442,11 +460,16 @@ function Scene() {
                 this.m_Primitive[prim].GetMaterial().SetSpecular(0.6);
                 this.m_Primitive[prim].GetMaterial().SetDiffuse(0.6);
                 this.m_Primitive[prim].GetMaterial().SetColor(new vector3(0.3, 1.0, 0.4));
-                prim = prim + 1;
+                prim++;
             }
         }
 
         this.m_Primitives = prim;
+        
+        /*
+        for(i = 0; i < 8; i++)
+        	console.log(i + " " + this.GetPrimitive(i).toString());
+        */
     }
 
     // @return {float} number of primitives in this scene
@@ -501,7 +524,7 @@ function Engine()
 {
 	//default constructor
 	this.m_Scene = new Scene();
-  this.m_Scene.InitScene();
+	this.m_Scene.InitScene();
 
 	//@param {Pixel} a_Dest
 	//@param {int} a_Width a_Height
@@ -539,22 +562,18 @@ function Engine()
 			var pr = this.m_Scene.GetPrimitive( s );
 			//console.log("pr is "+pr.toString());
 			//console.log("ray is "+a_Ray.m_Origin.toString()+"  Dir:"+a_Ray.m_Direction.toString());
-			//@param {int}
-			var res;
-			var prReturn = pr.Intersect(a_Ray, a_Dist);
+			// @param [0] {int} [1] {float}
+			var res = pr.Intersect(a_Ray, a_Dist);
 			
-			if(prReturn[0] != 0)
+			if(res[0] != 0)
 			{
-				a_Dist = prReturn[1];
-				ret[2] = a_Dist;
-				//console.log("intersect with pr"+pr.toString());
+				a_Dist = res[1];
 				prim = pr;
-				result = res; 
+				result = res[0]; 
 			}
 		}
 
-		//console.log("prim is "+prim);
-		if (!prim) {ret[0]=0;return ret;};
+		if (!prim) { ret[0] = 0; return ret; };
 
 		var a_Acc = new vector3();
 		
@@ -580,7 +599,7 @@ function Engine()
 					// handle point light source
 					//@param {float}
 					var shade = 1.0;
-					if (light.GetType() == 1)
+					if (light.GetType() == 1) // SPHERE
 					{
 						//@param {vector3}
 						var L = light.GetCentre().Sub(pi);
@@ -592,12 +611,10 @@ function Engine()
 						for ( var s = 0; s < this.m_Scene.GetNrPrimitives(); s++ )
 						{
 							//@param {Primitive}
-							pr = this.m_Scene.GetPrimitive( s );
-							//if ((pr != light) && (pr.Intersect(r, tdist)))
-							
-							var ret = pr.Intersect(r);
+							var pr = this.m_Scene.GetPrimitive( s );
+							var ret1 = pr.Intersect(r, tdist);
 
-							if((pr != light) && (ret[0]))
+							if((pr != light) && (ret1[0]))
 							{
 								shade = 0;
 								break;
@@ -619,7 +636,7 @@ function Engine()
 							if (dot > 0)
 							{
 								//@param {float}
-								var diff = dot * prim.GetMaterial().GetDiffuse();
+								var diff = dot * prim.GetMaterial().GetDiffuse() * shade;
 								// add diffuse component to ray color
 								a_Acc = a_Acc.Add( (prim.GetMaterial().GetColor().Mul(light.GetMaterial().GetColor())).Mul(diff)); 
 							}
@@ -638,6 +655,7 @@ function Engine()
 							{
 								// @param {float}
 								var spec = Math.pow( dot, 20) * prim.GetMaterial().GetSpecular() * shade;
+								a_Acc = a_Acc.Add(light.GetMaterial().GetColor().Mul(spec));
 							}
 						}
 					} // end of if
@@ -647,11 +665,11 @@ function Engine()
 		// calculate reflection
 		//@param {float}
 		var refl = prim.GetMaterial().GetReflection();
+			
 		if ((refl > 0.0) && (a_Depth < TRACEDEPTH))
 		{
 			//@param {vector3}
 			var N = prim.GetNormal( pi );
-			//var R = a_Ray.GetDirection().Sub((DOT( a_Ray.GetDirection(), N ).Mul(N)).Mul(2.0));
 			var R = a_Ray.GetDirection().Sub(N.Mul(2.0 * DOT(a_Ray.GetDirection(), N)));
 			var rcol = new vector3( 0, 0, 0 );
 			//@param {float}
@@ -659,7 +677,6 @@ function Engine()
 			var ret = this.Raytrace( new Ray( pi.Add(R.Mul(EPSILON)), R ), a_Depth + 1, a_RIndex);
 			rcol = ret[1];
 			a_Acc = a_Acc.Add(prim.GetMaterial().GetColor().Mul(rcol.Mul(refl)));
-			//a_Acc = a_Acc.Add( refl.Mul(rcol.Mul(prim.GetMaterial().GetColor())));
 		}
 		// calculate refraction
 		//@param {float}
@@ -674,6 +691,7 @@ function Engine()
 			//@param {float}
 			var cosI = -DOT( N, a_Ray.GetDirection() );
 			var cosT2 = 1.0 - n * n * (1.0 - cosI * cosI);
+			
 			if (cosT2 > 0.0)
 			{
 				//@param {vector3}
