@@ -632,6 +632,16 @@ function Engine()
 		}
 		return true;
 	}
+	//@param {float}
+    var m_WX1, m_WY1, m_WX2, m_WY2, m_DX, m_DY, m_SX, m_SY;
+    //@param {Scene}
+    var m_Scene;
+    //@param {Pixel}
+    var m_Dest;
+    //@param {int}
+    var m_Width, m_Height, m_CurrLine, m_PPos;
+    //@param {Primitive}
+    var m_LastRow;
 }
 
 //#############################################################################
