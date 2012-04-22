@@ -649,12 +649,13 @@ function Engine()
 							var V = a_Ray.GetDirection();
 							// @param {vector3}
 							var R = L.Sub(N.Mul(2.0 * DOT(L, N)));
+							R.Normalize();
 							// @param {float}
 							var dot = DOT(V, R);
 							if(dot > 0)
 							{
 								// @param {float}
-								var spec = Math.pow( dot, 1) * prim.GetMaterial().GetSpecular() * shade;
+								var spec = Math.pow( dot, 20) * prim.GetMaterial().GetSpecular() * shade;
 								a_Acc = a_Acc.Add(light.GetMaterial().GetColor().Mul(spec));
 							}
 						}
