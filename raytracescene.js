@@ -54,6 +54,100 @@ function testRaytraceScene(imageData)
 	console.log("Test Engine C.Render: ");//*/
 }
 //#############################################################################
+// class Texture
+// @param {vector3} a_Bitmap
+// @param {int} a_Width, a_Height
+function Texture( a_Bitmap, a_Width, a_Height)	{
+	//constructure
+	if(typeof(a_Width) == "undefined"){
+		// @param {FILE}
+		a_File = a_Bitmap;
+		//var f = fopen( a_File, 0 );
+		var fso = new ActiveXObject("Scripting.FileSystemObject");
+		var f = fso.OpenTextFile(a_File, 1, true); 		
+		
+		if (f)
+		{
+			var length = flength(f);
+			// extract width and height from file header
+			// @param {unsigned char}
+			var buffer = new Array(20);
+			fread( buffer, 1, 20, f );
+			this.m_Width = buffer[12] + 256 * buffer[13];
+			this.m_Height = buffer[14] + 256 * buffer[15];
+			fclose( f );
+			// read pixel data
+			f = fopen( a_File, 0 );
+			// @param {unsigned char}
+			var length = this.m_Width * this.m_Height * 3 + 1024;
+			var t = new Array(length);
+			//fread( t, 1, this.m_Width * this.m_Height * 3 + 1024, f );
+			//fclose( f );
+			// convert RGB 8:8:8 pixel data to floating point RGB  new Color[m_Width * m_Height];
+			this.m_Bitmap = new vector3(this.m_Width * this.m_Height);
+			// @param {float}
+			var rec = 1.0 / 256;
+			for ( var size = this.m_Width * this.m_Height, i = 0; i < size; i++ )
+				this.m_Bitmap[i] = vector3( t[i * 3 + 20] * rec, t[i * 3 + 19] * rec, t[i * 3 + 18] * rec );
+			delete t;
+		}		
+	}
+	//defualt constructor
+	else{
+		this.m_Bitmap = a_Bitmap;
+		this.m_Width = a_Width;
+		this.m_Height = a_Height;
+	}
+	
+	// @param {vector3} GetBitmap, m_Bitmap
+	this.GetBitmap = function() { return this.m_Bitmap;}
+	
+	// @param {vector3} GetTexel
+	// @param {float} a_U, a_V
+	this.GetTexel = function( a_U, a_V) {
+		
+		// fetch a bilinearly filtered texel
+		// @param {float} 
+		var fu = (a_U + 1000.5) * this.m_Width;
+		var fv = (a_V + 1000.0) * this.m_Width;
+		// @param {int} 
+		var u1 = fu % this.m_Width;
+		var v1 = fv % this.m_Height;
+		var u2 = (u1 + 1) % this.m_Width;
+		var v2 = (v1 + 1) % this.m_Height;
+		// calculate fractional parts of u and v
+		// @param {float} 
+		var fracu = fu - Math.floor( fu );
+		var fracv = fv - Math.floor( fv );
+		// calculate weight factors
+		// @param {float}
+		var w1 = (1 - fracu) * (1 - fracv);
+		var w2 = fracu * (1 - fracv);
+		var w3 = (1 - fracu) * fracv;
+		var w4 = fracu *  fracv;
+		// fetch four texels
+		// @param {vactor3} 
+		var c1 = this.m_Bitmap[u1 + v1 * this.m_Width];
+		var c2 = this.m_Bitmap[u2 + v1 * this.m_Width];
+		var c3 = this.m_Bitmap[u1 + v2 * this.m_Width];
+		var c4 = this.m_Bitmap[u2 + v2 * this.m_Width];
+		// scale and sum the four colors
+		//return c1 * w1 + c2 * w2 + c3 * w3 + c4 * w4;
+		return c1.Mul(w1).Add(c2.Mul(w2).Add(c3.Mul(w3).Add(c4.Mul(w4))));
+	};
+	
+	// @param {return int}
+	this.GetWidth = function() { return this.m_Width;}
+	
+	// @param {return int}
+	this.GetHeight = function() { return this.m_Height;}
+	
+	// @param {vector3}
+	var m_Bitmap;
+	// @param {int}
+	var m_Width, m_Height;
+}
+//#############################################################################
 // class Material
 function Material() {
     // default constructor
@@ -63,7 +157,10 @@ function Material() {
     this.m_Diff = 0.2;
     this.m_Spec = 0.8;
     this.m_RIndex = 1.5;
-
+	this.m_Texture = 0;
+	this.m_UScale = 1.0;
+	this.m_VScale = 1.0;
+	
     // @param {Color} a_color
     this.SetColor = function (a_color) { this.m_color = a_color; }
 
@@ -100,6 +197,29 @@ function Material() {
     // @return {float} RIndex of this material
     this.GetRefrIndex = function () { return this.m_RIndex; }
 
+	// @param {Texture} a_Tecture
+	this.SetTexture = function (a_Tecture)	{ this.m_Texture = a_Texture; }
+
+	// @param {float} a_UScale, a_VScale
+	this.SetUVScale = function(a_UScale, a_VScale) {
+		this.m_UScale = a_UScale; 
+		this.m_VScale = a_VScale; 
+		this.m_RUScale = 1.0 / a_UScale;
+		this.m_RVScale = 1.0 / a_VScale;
+	};
+	
+	// @param {float}
+	this.GetUScale = function() { return this.m_UScale; }
+	
+	// @param {float}
+	this.GetVScale = function() { return this.m_VScale; }
+	
+	// @param {float}
+	this.GetUScaleReci = function() { return this.m_RUScale; }
+	
+	// @param {float}
+	this.GetVScaleReci = function() { return this.m_RVScale; }
+	
     // @return {String}
     this.toString = function () {
         return "[ Material Color: " + this.m_color.toString() + " Refl: " + this.m_Refl
@@ -200,6 +320,9 @@ function Sphere(a_Centre, a_Radius) {
         this.m_RRadius = 1.0 / a_Radius;
         this.m_Material = new Material();
         this.m_RayID = -1;
+		this.m_Vn = new vector3( 0, 1, 0 );
+		this.m_Ve = new vector3( 1, 0, 0 );
+		this.m_Vc = this.m_Vn.Cross( this.m_Ve );
     }
 
     // @return {vertor3} centre of this sphere
@@ -288,6 +411,32 @@ function Sphere(a_Centre, a_Radius) {
     // @param {Material} a_Mat
     this.SetMaterial = function (a_Mat) { this.m_Material = a_Mat; }
 
+	// @param {Texture} a_Texture
+	this.SetTexture = function(a_Texture) { this.m_Texture = a_Texture; }
+	
+	// @param {vector3}
+	this.GetColor = function (a_Pos){
+		// @param {vector3}
+		var retval = new vector3();
+		if (!this.m_Material.GetTexture()) 
+			retval = this.m_Material.GetColor(); 
+		else
+		{
+			// @param {vector3}
+			var vp = (a_Pos.Sub(this.m_Centre).Mul(m_RRadius));
+			// @param {float}
+			var phi = Math.acos( Math.PI * (-DOT( vp, m_Vn )/180) );
+			var u, v = phi * this.m_Material.GetVScaleReci() * (1.0 / PI);
+			var theta = (Math.acos( Math.PI * (DOT( this.m_Ve, vp ) / Math.sin( Math.PI * (phi / 180) )/ 180 ))) * (2.0 / PI);
+			if (DOT( this.m_Vc, vp ) >= 0) 
+				u = (1.0 - theta) * this.m_Material.GetUScaleReci();
+			else 
+				u = theta * this.m_Material.GetUScaleReci();
+			retval = this.m_Material.GetColor().Mul(this.m_Material.GetTexture().GetTexel( u, v ));
+		}
+		return retval;
+	}
+	
     // @return {int} ray id
     this.GetLastRayID = function() { return m_RayID; }
     
@@ -321,6 +470,8 @@ function PlanePrim(a_Normal, a_D) {
         this.m_Plane = new plane(a_Normal, a_D);
         this.m_Material = new Material();
         this.m_RayID = -1;
+		this.m_UAxis = new vector3( this.m_Plane.N.y, this.m_Plane.N.z, -this.m_Plane.N.x );
+		this.m_VAxis = this.m_UAxis.Cross( this.m_Plane.N );
     }
     // @return {vector3} normal of this planeprim
     this.GetNormal = function () { return this.m_Plane.N; }
@@ -389,7 +540,30 @@ function PlanePrim(a_Normal, a_D) {
 
     // @param {Material} a_Mat
     this.SetMaterial = function (a_Mat) { this.m_Material = a_Mat; }
-    
+ 
+	// @param {Texture} a_Texture
+	this.SetTexture = function(a_Texture) { this.m_Texture = a_Texture; }
+	
+	// @param {vector3}
+	this.GetColor = function(a_Pos) {
+		// @param {vector3}
+		var retval = new vector3();
+		if (this.m_Material.GetTexture())
+		{
+			// @param {Texture}
+			t = this.m_Material.GetTexture();
+			// @param {float}
+			var u = DOT( a_Pos, this.m_UAxis ) * this.m_Material.GetUScale();
+			var v = DOT( a_Pos, this.m_VAxis ) * this.m_Material.GetVScale();
+			retval = this.m_Material.GetColor().Mul(t.GetTexel( u, v ));
+		}
+		else
+		{
+			retval = this.m_Material.GetColor();
+		}
+		return retval;
+	}
+ 
     // @return {int} ray id
     this.GetLastRayID = function() { return m_RayID; }
     
@@ -619,6 +793,7 @@ function Scene() {
         this.m_Primitive[0].GetMaterial().SetRefraction(0);
         this.m_Primitive[0].GetMaterial().SetDiffuse(1);
         this.m_Primitive[0].GetMaterial().SetColor(new vector3(0.4, 0.3, 0.3));
+//		this.m_Primitive[0].GetMaterial().SetTexture(new Texture( "textures/wood.tga" ));
         // big sphere
         this.m_Primitive[1] = new Sphere(new vector3(2, 0.8, 3), 2.5);
         this.m_Primitive[1].SetName("big sphere");
@@ -626,6 +801,7 @@ function Scene() {
         this.m_Primitive[1].GetMaterial().SetRefraction(0.8);
         this.m_Primitive[1].GetMaterial().SetRefrIndex(1.3);
         this.m_Primitive[1].GetMaterial().SetColor(new vector3(0.7, 0.7, 1.0));
+//		this.m_Primitive[1].GetMaterial().SetTexture(new Texture( "textures/marble.tga" ));
         // small sphere
         this.m_Primitive[2] = new Sphere(new vector3(-5.5, -0.5, 7), 2);
         this.m_Primitive[2].SetName("small sphere");
@@ -634,6 +810,7 @@ function Scene() {
         this.m_Primitive[2].GetMaterial().SetRefrIndex(1.3);
         this.m_Primitive[2].GetMaterial().SetDiffuse(0.1);
         this.m_Primitive[2].GetMaterial().SetColor(new vector3(0.7, 0.7, 1.0));
+//		this.m_Primitive[2].GetMaterial().SetTexture(new Texture( "textures/marble.tga" ));
         // light source 1
         this.m_Primitive[3] = new Sphere(new vector3(0, 5, 5), 0.1);
         this.m_Primitive[3].Light(new Boolean(true));
@@ -656,6 +833,7 @@ function Scene() {
         this.m_Primitive[6].GetMaterial().SetSpecular(0);
         this.m_Primitive[6].GetMaterial().SetDiffuse(0.6);
         this.m_Primitive[6].GetMaterial().SetColor(new vector3(0.5, 0.3, 0.5));
+//		this.m_Primitive[6].GetMaterial().SetTexture(new Texture( "textures/wood.tga" ));
         // ceiling plane
         this.m_Primitive[7] = new PlanePrim(new vector3(0, -1, 0), 7.4);
         this.m_Primitive[7].SetName("back plane");
@@ -664,6 +842,7 @@ function Scene() {
         this.m_Primitive[7].GetMaterial().SetSpecular(0);
         this.m_Primitive[7].GetMaterial().SetDiffuse(0.5);
         this.m_Primitive[7].GetMaterial().SetColor(new vector3(0.4, 0.7, 0.7));
+//		this.m_Primitive[7].GetMaterial().SetTexture(new Texture( "textures/wood.tga" ));
         //grid
         var prim = 8;
         for (x = 0; x < 8; x++) {
