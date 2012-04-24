@@ -188,5 +188,49 @@ function plane(a_Normal,a_D)
 	this.cell = new Array(4);
 }
 
+//#############################################################################
+//class aabb
+// @param {vector3} a_Pos
+// @param {vector3} a_Size
+function aabb(a_Pos, a_Size)
+{
+    //default constructor
+    if (typeof (a_Pos) == "undefined") {
+        this.m_Pos = new vector3(0, 0, 0);
+        this.m_Size = new vector3(0, 0, 0);
+    } else { //constructor
+        this.m_Pos = a_Pos;
+        this.m_Size = a_Size;
+    }
 
+    // @return {vector3} position of this aabb
+    this.GetPos = function () { return this.m_Pos; }
+    
+    // @return {vector3} size of this aabb
+    this.GetSize = function () { return this.m_Size; }
+    
+    // @param {aabb}
+    // @return {Boolean}
+    this.Intersect = function (b2) {
+        // @param {vector3}
+        var v1 = b2.GetPos();
+        var v2 = b2.GetPos().Add(b2.GetSize());
+        var v3 = this.m_Pos;
+        var v4 = this.m_Pos.Add(this.m_Size);
+        return ((v4.x > v1.x) && (v3.x < v2.x) && // x-axis overlap
+				(v4.y > v1.y) && (v3.y < v2.y) && // y-axis overlap
+				(v4.z > v1.z) && (v3.z < v2.z));   // z-axis overlap
+    }
+
+    // @param {vector3}
+    // return {Boolean}
+    this.Contains = function (a_Pos) {
+        // @param {vector3}
+        var v1 = this.m_Pos;
+        var v2 = this.m_Pos.Add(this.m_Size);
+        return ((a_Pos.x > (v1.x - EPSILON)) && (a_Pos.x < (v2.x + EPSILON)) &&
+				(a_Pos.y > (v1.y - EPSILON)) && (a_Pos.y < (v2.y + EPSILON)) &&
+				(a_Pos.z > (v1.z - EPSILON)) && (a_Pos.z < (v2.z + EPSILON)));
+    }
+}
 
