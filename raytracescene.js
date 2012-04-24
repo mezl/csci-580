@@ -118,13 +118,7 @@ function Primitive() {
     // default constructor
     this.m_Name = 0;
     this.m_Light = new Boolean(false);
-    //this.m_Material = new Material();
-
-    // @return {Material} material of this primitive
-    //this.GetMaterial = function () { return this.m_Material; }
-
-    // @param {Material} a_Mat
-    //this.SetMaterial = function (a_Mat) { this.m_Material = a_Mat; }
+    //this.m_RayID = -1;
 
     // @return {int} type of this primitive
     this.GetType = function () { return 0; }
@@ -133,6 +127,10 @@ function Primitive() {
     // @param {float} a_Dist
     // @return {int} intersection type
     this.Intersect = function (a_Ray) { return 0; }
+
+    // @param {aabb}
+    // @return {Boolean}
+    this.IntersectBox = function(a_Box) { return 0; }
 
     // @param {vector3} a_Pos
     // @return {vector3} normal of the primitive
@@ -144,9 +142,13 @@ function Primitive() {
     // @param {Boolean} a_Light
     this.Light = function (a_Light) { this.m_Light = a_Light; }
 
+    // @return {aabb}
+    this.GetAABB = function () { return 0; }
+
     // @return {Boolean} is this primitive a light
     this.IsLight = function () { return this.m_Light.valueOf(); }
 
+    
     // @param {String} a_Name
     this.SetName = function (a_Name) { this.m_Name = a_Name; }
 
@@ -189,6 +191,7 @@ function Sphere(a_Centre, a_Radius) {
         this.m_Radius = 1.0;
         this.m_RRadius = 1.0 / 1.0;
         this.m_Material = new Material();
+        this.m_RayID = -1;
     } else {
         // constructor
         this.m_Centre = a_Centre;
@@ -196,6 +199,7 @@ function Sphere(a_Centre, a_Radius) {
         this.m_Radius = a_Radius;
         this.m_RRadius = 1.0 / a_Radius;
         this.m_Material = new Material();
+        this.m_RayID = -1;
     }
 
     // @return {vertor3} centre of this sphere
@@ -237,53 +241,55 @@ function Sphere(a_Centre, a_Radius) {
 
         return result;
     }
-    
-    /*
-    // @param {Ray} a_Ray
-    // @return {Array} [0] intersection type [1] distance
-    this.Intersect = function (a_Ray) {
-        var result = new Array(2);
-        var a_Dist = Number.MAX_VALUE;
-        var v = a_Ray.GetOrigin().Sub(this.m_Centre);
-        var b = -DOT(v, a_Ray.GetDirection());
-        var det = (b * b) - DOT(v, v) + this.m_SqRadius;
-        var retval = MISS;
-        if (det > 0) {
-            det = Math.sqrt(det);
-            var i1 = b - det;
-            var i2 = b + det;
-            if (i2 > 0) {
-                if (i1 < 0) {
-                    if (i2 < a_Dist) {
-                        a_Dist = i2;
-                        retval = INPRIM;
-                    }
-                }
-                else {
-                    if (i1 < a_Dist) {
-                        a_Dist = i1;
-                        retval = HIT;
-                    }
-                }
-            }
-        }
-        result[0] = retval;
-        result[1] = a_Dist;
 
-        return result;
-    }*/
+    // @param {aabb} a_Box
+    // @return {Boolean}
+    this.IntersectBox = function (a_Box) {
+        // @param {float}
+        var dmin = 0.0;
+        // @param {vector3}
+        var v1 = a_Box.GetPos();
+        var v2 = a_Box.GetPos().Add(a_Box.GetSize());
+
+        if (this.m_Centre.x < v1.x) {
+            dmin = dmin + (this.m_Centre.x - v1.x) * (this.m_Centre.x - v1.x);
+        } else if (this.m_Centre.x > v2.x) {
+            dmin = dmin + (this.m_Centre.x - v2.x) * (this.m_Centre.x - v2.x);
+        }
+
+        if (this.m_Centre.y < v1.y) {
+            dmin = dmin + (this.m_Centre.y - v1.y) * (this.m_Centre.y - v1.y);
+        } else if (this.m_Centre.y > v2.y) {
+            dmin = dmin + (this.m_Centre.y - v2.y) * (this.m_Centre.y - v2.y);
+        }
+
+        if (this.m_Centre.z < v1.z) {
+            dmin = dmin + (this.m_Centre.z - v1.z) * (this.m_Centre.z - v1.z);
+        } else if (this.m_Centre.z > v2.z) {
+            dmin = dmin + (this.m_Centre.z - v2.z) * (this.m_Centre.z - v2.z);
+        }
+        return (dmin <= this.m_SqRadius);
+    }
 
     // @param {vector3} a_Pos
     // @return {vector3} normal
     this.GetNormal = function (a_Pos) { return (a_Pos.Sub(this.m_Centre)).Mul(this.m_RRadius); }
 
-    
+    // @return {aabb}
+    this.GetAABB = function () {
+        // @param {vector3}
+        var size = new vector3(this.m_Radius, this.m_Radius, this.m_Radius);
+        return new aabb(this.m_Centre.Sub(size), size.Mul(2));
+    }
 
     // @return {Material} material of this primitive
     this.GetMaterial = function () { return this.m_Material; }
 
     // @param {Material} a_Mat
     this.SetMaterial = function (a_Mat) { this.m_Material = a_Mat; }
+
+    // @return {int} ray id
+    this.GetLastRayID = function() { return m_RayID; }
     
     this.toString = function () {
         return "[ Sphere Primitive: " + this.primToString() + " Centre: " + this.m_Centre.toString() + " SqRadius: " + this.m_SqRadius
@@ -309,10 +315,12 @@ function PlanePrim(a_Normal, a_D) {
         // default constructor
         this.m_Plane = new plane(new vector3(0, 1, 0), 1.0);
         this.m_Material = new Material();
+        this.m_RayID = -1;
     } else {
         //constructor
         this.m_Plane = new plane(a_Normal, a_D);
         this.m_Material = new Material();
+        this.m_RayID = -1;
     }
     // @return {vector3} normal of this planeprim
     this.GetNormal = function () { return this.m_Plane.N; }
@@ -341,35 +349,40 @@ function PlanePrim(a_Normal, a_D) {
         result[1] = a_Dist;
         return result;
     }
-    
-    /*
-    // @param {Ray} a_Ray
-    // @return {Array} [0] intersection type [1] distance
-    this.Intersect = function (a_Ray) {
-        var result = new Array(2);
-        var a_Dist = Number.MAX_VALUE;
-        var retval = MISS;
-        var d = DOT(this.m_Plane.N, a_Ray.GetDirection());
-        if (d != 0) {
-            var dist = -(DOT(this.m_Plane.N, a_Ray.GetOrigin()) + this.m_Plane.D) / d;
-            if (dist > 0) {
-                if (dist < a_Dist) {
-                    a_Dist = dist;
-                    retval = HIT;
-                    //return HIT;
-                }
+
+    // @param {aabb} a_Box
+    // @return {Boolean}
+    this.IntersectBox = function (a_Box) {
+        // @param {vector3}
+        var v = new Array(2);
+        v[0] = a_Box.GetPos();
+        v[1] = a_Box.GetPos().Add(a_Box.GetSize());
+        // @param {int}
+        var side1 = 0;
+        var side2 = 0;
+        for (var i = 0; i < 8; i++) {
+            // @param {vector3}
+            var p = new vector3(v[i & 1].x, v[(i >> 1) & 1].y, v[(i >> 2) & 1].z);
+            if ((DOT(p, this.m_Plane.N) + this.m_Plane.D) < 0) {
+                side1++;
+            } else {
+                side2++;
             }
         }
-        //return MISS;
-
-        result[0] = retval;
-        result[1] = a_Dist;
-        return result;
-    }*/
+        if ((side1 == 0) || (side2 == 0))
+            return false;
+        else
+            return true;
+    }
 
     // @param {vector3} a_Pos
     // @return {vector3} normal
     this.GetNormal = function (a_Pos) { return this.m_Plane.N; }
+
+    // @return {aabb}
+    this.GetAABB = function () {
+        return new aabb(new vector3(-10000, -10000, -10000), new vector3(20000, 20000, 20000));
+    }
 
     // @return {Material} material of this primitive
     this.GetMaterial = function () { return this.m_Material; }
@@ -377,10 +390,212 @@ function PlanePrim(a_Normal, a_D) {
     // @param {Material} a_Mat
     this.SetMaterial = function (a_Mat) { this.m_Material = a_Mat; }
     
+    // @return {int} ray id
+    this.GetLastRayID = function() { return m_RayID; }
+    
     this.toString = function () {
         return "[ PlanePrim Primitive: " + this.primToString() + " Normal: "
 		+ this.GetNormal().toString() + " D: " + this.GetD() + " ]";
     }
+}
+
+//#############################################################################
+//class Box
+function Box(a_Box) {
+    // Intersection method return values
+    var HIT = 1; 	// Ray hit primitive
+    var MISS = 0; 	// Ray missed primitive
+    var INPRIM = -1; // Ray started inside primitive
+	
+    var AABB = 3;
+    // @return {int} type of this primitive
+    this.GetType = function () { return AABB; }
+
+    if (typeof (a_Box) == "undefined") {
+        // default constructor
+        this.m_Box = new aabb(new vector3(0, 0, 0), new vector3(0, 0, 0));
+        this.m_Grid = 0.0;
+        
+        this.m_Material = new Material();
+        this.m_RayID = -1;
+        this.m_Light = new Boolean(false);
+    } else {
+        //constructor
+        this.m_Box = a_Box;
+        this.m_Grid = 0.0;
+        
+        this.m_Material = new Material();
+        this.m_RayID = -1;
+        this.m_Light = new Boolean(false);
+    }
+    
+    // @param {Ray} a_Ray
+    // @param {float} a_Dist
+    // @return {Array} [0] intersection type [1] a_Dist
+    this.Intersect = function (a_Ray, a_Dist) {
+    	var result = new Array(2);
+    	this.m_RayID = a_Ray.GetID();
+        // @param {float}
+    	var dist = new Array(6);
+    	// @param {vector3}
+    	var ip = new Array(6);
+    	var d = a_Ray.GetDirection();
+    	var o = a_Ray.GetOrigin();
+    	// @param {Boolean}
+    	var retval = MISS;
+    	for (var i = 0; i < 6; i++)
+    		dist[i] = -1;
+    	// @param {vector3}
+    	var v1 = this.m_Box.GetPos();
+    	var v2 = this.m_Box.GetPos().Add(this.GetSize());
+    	if(d.x)
+    	{
+    		// @param {float}
+    		var rc = 1.0 / d.x;
+    		dist[0] = (v1.x - o.x) * rc;
+    		dist[3] = (v2.x - o.x) * rc;
+    	}
+    	if(d.y)
+    	{
+    		//@param {float}
+    		var rc = 1.0 / d.y;
+    		dist[1] = (v1.y - o.y) * rc;
+    		dist[4] = (v2.y - o.y) * rc;
+    	}
+    	if (d.z) 
+    	{
+    		var rc = 1.0 / d.z;
+    		dist[2] = (v1.z - o.z) * rc;
+    		dist[5] = (v2.z - o.z) * rc;
+    	}
+    	for(var i = 0; i < 6; i++)
+    	{
+    		if(dist[i] > 0)
+    		{
+    			ip[i] = o.Add(d.Mul(dist[i]));
+    			if ((ip[i].x > (v1.x - EPSILON)) && (ip[i].x < (v2.x + EPSILON)) && 
+    				(ip[i].y > (v1.y - EPSILON)) && (ip[i].y < (v2.y + EPSILON)) &&
+    				(ip[i].z > (v1.z - EPSILON)) && (ip[i].z < (v2.z + EPSILON)))
+    			{
+    				if (dist[i] < a_Dist) 
+    				{
+    					a_Dist = dist[i];
+    					retval = HIT;
+    				}
+    			}
+    		}
+    	}
+    	
+        result[0] = retval;
+        result[1] = a_Dist;
+        return result;
+    }
+    
+    // @param {aabb} a_Box
+    // @return {Boolean} 
+    this.IntersectBox = function(a_Box){ return this.m_Box.Intersect(a_Box); }
+    
+    // @param {vector3}
+    // @return {vector3}
+    this.GetNormal = function(a_Pos){
+    	// @param {float}
+    	var dist = new Array(6);
+    	dist[0] = Math.abs(this.m_Box.GetSize().x - this.m_Box.GetPos().x);
+    	dist[1] = Math.abs(this.m_Box.GetSize().x + this.m_Box.GetSize().x - this.m_Box.GetPos().x );
+    	dist[2] = Math.abs(this.m_Box.GetSize().y - this.m_Box.GetPos().y );
+    	dist[3] = Math.abs(this.m_Box.GetSize().y + this.m_Box.GetSize().y - this.m_Box.GetPos().y );
+    	dist[4] = Math.abs(this.m_Box.GetSize().z - this.m_Box.GetPos().z );
+    	dist[5] = Math.abs(this.m_Box.GetSize().z + this.m_Box.GetSize().z - this.m_Box.GetPos().z );
+    	// @param {int}
+    	var best = 0;
+    	// @param {float}
+    	var bdist = dist[0];
+    	for(var i = 1; i < 6; i++)
+    	{
+    		if( dist[i] < bdist)
+    		{
+    			bdist = dist[i];
+    			best = i;
+    		}
+    	}
+    	if (best == 0) return new vector3( -1, 0, 0 );
+    	else if (best == 1) return new vector3( 1, 0, 0 );
+    	else if (best == 2) return new vector3( 0, -1, 0 );
+    	else if (best == 3)  return new vector3( 0, 1, 0 );
+    	else if (best == 4) return new vector3( 0, 0, -1 );
+    	else return new vector3( 0, 0, 1 );
+    }
+    
+    // @param {vector3} a_Pos
+    // @return {Boolean}
+    this.Contains = function(a_Pos) { return this.m_Box.Contains(a_Pos); }
+    
+    // @return {vector3} position of this box
+    this.GetPos = function() { return this.m_Box.GetPos(); }
+    
+    // @return {vector3} size of this box
+    this.GetSize = function() { return this.m_Box.GetSize(); }
+    
+    // @param {int} a_Idx
+    // @return {float} 
+    this.GetGridX = function(a_Idx) { return this.m_Grid[a_Idx << 1]; }
+    
+    // @param {int} a_Idx
+    // @return {float}
+    this.GetGridY = function(a_Idx) { return this.m_Grid[(a_Idx << 1) + 1]; }
+    
+    // @param {Boolean} a_Light
+    this.Light = function(a_Light) {
+    	this.m_Light = a_Light;
+    	if(!this.m_Grid)
+    	{
+    		this.m_Grid = new Array(32);
+    		this.m_Grid[ 0] = 1;
+    		this.m_Grid[ 1] = 2;
+    		this.m_Grid[ 2] = 3;
+    		this.m_Grid[ 3] = 3;
+    		this.m_Grid[ 4] = 2;
+    		this.m_Grid[ 5] = 0;
+    		this.m_Grid[ 6] = 0;
+    		this.m_Grid[ 7] = 1;
+    		this.m_Grid[ 8] = 2;
+    		this.m_Grid[ 9] = 3;
+    		this.m_Grid[10] = 0;
+    		this.m_Grid[11] = 3;
+    		this.m_Grid[12] = 0;
+    		this.m_Grid[13] = 0;
+    		this.m_Grid[14] = 2;
+    		this.m_Grid[15] = 2;
+    		this.m_Grid[16] = 3;
+    		this.m_Grid[17] = 1;
+    		this.m_Grid[18] = 1;
+    		this.m_Grid[19] = 3;
+    		this.m_Grid[20] = 1;
+    		this.m_Grid[21] = 0;
+    		this.m_Grid[22] = 3;
+    		this.m_Grid[23] = 2;
+    		this.m_Grid[24] = 2;
+    		this.m_Grid[25] = 1;
+    		this.m_Grid[26] = 3;
+    		this.m_Grid[27] = 0;
+    		this.m_Grid[28] = 1;
+    		this.m_Grid[29] = 1;
+    		this.m_Grid[30] = 0;
+    		this.m_Grid[31] = 2;
+    		for ( var i = 0; i < 16; i++ )
+    		{
+    			this.m_Grid[i * 2] = this.m_Grid[i * 2] * this.m_Box.GetSize().x / 4 + this.m_Box.GetPos().x;
+    			this.m_Grid[i * 2 + 1] = this.m_Grid[i * 2 + 1] * this.m_Box.GetSize().z / 4 + this.m_Box.GetPos().z;
+    		}
+    	}
+    }
+    
+    // @return {aabb}
+    this.GetAABB = function() { return this.m_Box; }
+    
+    // @return {int} ray id
+    this.GetLastRayID = function() { return m_RayID; }
+    
 }
 
 //#############################################################################
@@ -487,19 +702,22 @@ function Scene() {
     }
 }
 //#############################################################################
-// @param {vector3} m_Origin m_Direction
+// @param {vector3} a_Origin a_Direction
+// @param {int} a_ID
 // class Ray
-function Ray(m_Origin, m_Direction)
+function Ray(a_Origin, a_Direction, a_ID)
 {
 	//default constructor
-	if(typeof(m_Origin) == "undefined") {	
+	if(typeof(a_Origin) == "undefined") {	
 											this.m_Origin = new vector3( 0, 0, 0 );
-											this.m_Direction = new vector3( 0, 0, 0 );
+											this.m_Direction = new vector3(0, 0, 0);
+                                            this.m_ID = 0;
 										}										
 	//constructor
 	else	{ 
-				this.m_Origin = m_Origin; 
-				this.m_Direction = m_Direction;
+				this.m_Origin = a_Origin; 
+				this.m_Direction = a_Direction;
+				this.m_ID = a_ID;
 			}
 
 	
@@ -513,6 +731,12 @@ function Ray(m_Origin, m_Direction)
 
 	this.GetDirection = function() { return this.m_Direction;}
 
+	// @param {int} a_ID
+	this.SetID = function(a_ID){ this.m_ID = a_ID; }
+	
+	// @return {int} ID of this ray
+	this.GetID = function(){ return this.m_ID; }
+	
 	//@param {vector3}
 	var m_Origin = new vector3();
 	//@param {vector3}
