@@ -993,6 +993,7 @@ function Scene() {
         PlanePrim.prototype = new Primitive(); // set parent
 
         this.m_Primitive = new Array(500);
+        
         // ground plane
         this.m_Primitive[0] = new PlanePrim(new vector3(0, 1, 0), 4.4);
         this.m_Primitive[0].prototype = new Primitive();
@@ -1002,6 +1003,7 @@ function Scene() {
         this.m_Primitive[0].GetMaterial().SetDiffuse(1);
         this.m_Primitive[0].GetMaterial().SetColor(new vector3(0.4, 0.3, 0.3));
 //		this.m_Primitive[0].GetMaterial().SetTexture(new Texture( "textures/wood.tga" ));
+        
         // big sphere
         this.m_Primitive[1] = new Sphere(new vector3(2, 0.8, 3), 2.5);
         this.m_Primitive[1].SetName("big sphere");
@@ -1051,6 +1053,7 @@ function Scene() {
         this.m_Primitive[7].GetMaterial().SetDiffuse(0.5);
         this.m_Primitive[7].GetMaterial().SetColor(new vector3(0.4, 0.7, 0.7));
 //		this.m_Primitive[7].GetMaterial().SetTexture(new Texture( "textures/wood.tga" ));
+        
         //grid
         var prim = 8;
         for (x = 0; x < 8; x++) {
@@ -1065,6 +1068,7 @@ function Scene() {
                 prim++;
             }
         }
+        
         // Triangle 
 												 //x					y					z					nx				ny				nz				u					v
 					var tri_data = ["2.400000	2.250000	1.000000	0.902861	-0.429934	0.000000	0.000000	0.000000",
@@ -1149,10 +1153,10 @@ function Ray(a_Origin, a_Direction, a_ID)
 }
 
 //@param {Boolean}
-var USE_SHADOW = new Boolean(false);
-var USE_REFLECTION = new Boolean(false);
-var USE_REFRACTION = new Boolean(false);
-var USE_SPECULAR = new Boolean(false);
+var USE_SHADOW = new Boolean(true);
+var USE_REFLECTION = new Boolean(true);
+var USE_REFRACTION = new Boolean(true);
+var USE_SPECULAR = new Boolean(true);
 
 // class Engine
 function Engine()
@@ -1182,7 +1186,8 @@ function Engine()
 
 
 
-		var ret = new Array(3);											
+		var ret = new Array(3);	
+		var a_Acc = new vector3();
 		if(a_Depth > TRACEDEPTH) {ret[0] = 0;return ret;}
 
 		//a_Depth = 1000000.0;
@@ -1211,13 +1216,10 @@ function Engine()
 			}
 		}
 
-		if (!prim) { ret[0] = 0; return ret; };
+		if (!prim) { ret[0] = 0; ret[1] = a_Acc; ret[2] = a_Dist; return ret; };
 
 		//check prim
 		//console.log("Trace Prim "+prim.toString());
-
-
-		var a_Acc = new vector3();
 		
 		if (prim.IsLight())
 		{
@@ -1328,8 +1330,7 @@ function Engine()
 				//var dist;
 				var ret = this.Raytrace( new Ray( pi.Add(R.Mul(EPSILON)), R ), a_Depth + 1, a_RIndex);
 				rcol = ret[1];
-				//console.log("Rcol is "+rcol);	
-				a_Acc = a_Acc.Add(prim.GetMaterial().GetColor().Mul(rcol.Mul(refl)));//debug
+				a_Acc = a_Acc.Add((prim.GetMaterial().GetColor()).Mul(rcol.Mul(refl)));
 			}
 		}
 		// calculate refraction
