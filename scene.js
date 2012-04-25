@@ -10,7 +10,7 @@ testScene();
 function testScene()
 {
 	var mat = new Material();
-	console.log("Test Material Default: " + mat.toString());
+	//console.log("Test Material Default: " + mat.toString());
 	console.log("Test Material Default Color: " + mat.GetColor().toString);
 	console.log("Test Material Default Refl: " + mat.GetReflection().toString());
 	console.log("Test Material Default Diff: " + mat.GetDiffuse().toString());

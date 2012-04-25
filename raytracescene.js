@@ -574,6 +574,213 @@ function PlanePrim(a_Normal, a_D) {
 }
 
 //#############################################################################
+//class Vertex
+function Vertex(a_Pos,a_U,a_V)
+{
+	//constructor Vertex(String)
+	//2.400000	2.250000	1.000000	0.902861	-0.429934	0.000000	0.000000	0.000000
+	//[0]x			[1]y			[2]z			[3]nx			[4]ny			[5]nz			[6]u			[7]v								
+	if (typeof (a_U) == "undefined") 
+	{
+			//array of number
+			var s = a_Pos.split("	");			
+		
+			//@param {vector3} pos
+			var pos =    new vector3(s[0],s[1],s[2]);
+			var normal = new vector3(s[3],s[4],s[5]);
+			//@param {float} u,v
+			var u = s[6]; var v = s[7];
+
+			this.m_Pos = pos;
+			this.m_Normal = normal;
+			this.m_U = u;
+			this.m_V = v;
+
+	}	else {
+		//constructor Vertex(pos,U,v)
+		this.m_Pos = a_Pos;
+		this.m_U = a_U;
+		this.m_V = a_V;
+	}
+	// @return { float }
+	this.GetU = function(){return this.m_U;}
+	// @return { float }
+	this.GetV = function(){return this.m_V;}
+	// @retrun { vector3 }
+	this.GetNormal = function(){return this.m_Normal;}
+	// @return { vector3 }
+	this.GetPos = function(){return this.m_Pos;}
+	// @param { float }a_U,a_V
+	this.SetUV = function(a_U,a_V){this.m_U = a_U;this.m_V = a_V;}
+	// @param { vector3 } a_Pos
+	this.SetPos = function(a_Pos){this.m_Pos = a_Pos;}
+	// @param { vector3 }
+	this.SetNormal = function(a_Normal){this.m_Normal = a_Normal;}
+}
+
+var MODULO = [0,1,2,0,1]; 
+//#############################################################################
+//class Triangle
+// @param {Vertex} v1,v2,v3
+function Triangle(v1,v2,v3) 
+{
+    // Intersection method return values
+    var HIT = 1; 	// Ray hit primitive
+    var MISS = 0; 	// Ray missed primitive
+    var INPRIM = -1; // Ray started inside primitive
+
+		this.m_Material = new Material();
+    var TRIANGLE = 4;
+    // @return {int} type of this primitive
+    this.GetType = function () { return TRIANGLE; }
+
+		//@param { Vertex }
+		this.m_Vertex = new Array(3);
+		this.m_Vertex[0] = v1;
+		this.m_Vertex[1] = v2;
+		this.m_Vertex[2] = v3;
+
+		//@param { vector3 }
+		var A = this.m_Vertex[0].GetPos();
+		var B = this.m_Vertex[1].GetPos();
+		var C = this.m_Vertex[2].GetPos();
+		var cc = B.Sub(A);
+		var bb = C.Sub(A);
+
+		//compute Normal
+		//@param { vector3 }
+		this.m_N = bb.Cross(cc);
+
+		//compute Axis
+		//@param { int } axis
+		var Nx = Math.abs(this.m_N.x);
+		var Ny = Math.abs(this.m_N.y);
+		var Nz = Math.abs(this.m_N.z);
+		if(Nx > Ny){
+			if(Nx > Nz){this.k = 0}else{this.k = 2}
+		}else{
+			if(Ny > Nz){this.k = 1}else{this.k = 2}
+		}
+		//@param {int}
+		var u,v;
+		u = MODULO[this.k+1];
+		v = MODULO[this.k+2];
+		this.ku = u;
+		this.kv = v;
+
+		//@param {float} krec,nu,nv,nd
+		var krec = 1.0 / this.m_N.cell(this.k);
+		this.nu = this.m_N.cell(u) * krec;
+		this.nv = this.m_N.cell(v) * krec;
+		this.nd = this.m_N.Dot( A ) * krec;
+
+
+		//@param {float}
+		var reci = 1.0/(bb.cell(u)*cc.cell(v) - bb.cell(v) * cc.cell(u));
+		
+		//@param { float }
+		this.bnu =   bb.cell(u) * reci;
+		this.bnv = -(bb.cell(v) * reci);
+		this.cnu =   cc.cell(v) * reci;
+		this.cnv = -(cc.cell(u) * reci );
+		this.m_N.Normalize();
+
+		console.log("Triangle's Normal is "+this.m_N.toString());
+	
+		
+
+		//@param { float }
+		this.m_U = 0.0;
+		this.m_V = 0.0;
+
+		this.m_Vertex[0].SetNormal(this.m_N);
+		this.m_Vertex[1].SetNormal(this.m_N);
+		this.m_Vertex[2].SetNormal(this.m_N);
+		
+
+
+    // @param {Ray} a_Ray
+    // @param {float} a_Dist
+    // @return {Array} [0] intersection type [1] a_Dist
+    this.Intersect = function (a_Ray, a_Dist) 
+		{
+			var ret = new Array(2);//return param
+			ret[1] = a_Dist;
+
+			//@param { float } ku,kv
+			var ku = this.ku;
+			var kv = this.kv;
+			var nu = this.nu;
+			var nv = this.nv;
+			var nd = this.nd;
+			//@param { int }
+			var k = this.k;
+
+			//@param { vector3 }
+			var O = a_Ray.GetOrigin();
+			var D = a_Ray.GetDirection();
+			var A = this.m_Vertex[0].GetPos();
+
+			//@param {float}
+			var lnd = 1.0 / (D.cell(k) + nu*D.cell(ku) + nv*D.cell(kv));
+			var t = (nd - O.cell(k) - nu* O.cell(ku) - nv * O.cell(kv) )*lnd;
+			
+			if(!(a_Dist > t && t > 0))	{
+				ret[0] = MISS;
+				return ret;
+			}
+			//@param {float} hu,hv,beta,gamma
+			var hu = O.cell(ku) + t* D.cell(ku) - A.cell(ku);
+			var hv = O.cell(kv) + t* D.cell(kv) - A.cell(kv);
+			var beta = hv * this.bnu + hu*this.bnv;
+			this.m_U = beta;
+			var gamma = hu * this.cnu + hu * this.bnv;
+			this.m_V = gamma;
+			if(beta < 0 || gamma < 0 || ((beta+gamma)> 1.0))
+			{
+				ret[0] = MISS;
+				return ret;
+			}
+			a_dist = t;
+			ret[1] = t;
+			if(DOT(D,this.m_N) > 0){
+				ret[0] = INPRIM;
+			}else{ 
+				ret[0] = HIT;
+			}
+			return ret;
+		}
+		//##################################################################
+		//@return {vector3}
+		this.GetNormal = function()
+		{
+			return this.m_N;
+			////@param {vector3} N1,N2,N3
+			//var N1 = this.m_Vertex[0].GetPos();
+			//var N2 = this.m_Vertex[1].GetPos();
+			//var N3 = this.m_Vertex[2].GetPos();
+
+			////N = N1 +
+			////m_U * (N2 - N1) +
+			////m_V * (N3 - N1) 
+			////@param {vector3} N
+			//var N = N1.Add( ((N2.Sub(N1)).Mul(this.m_U)).Add( (N3.Sub(N1)).Mul(this.m_V)) );
+			//N.Normalize();
+			//console.log("Triangle's Normal is "+N.toString());
+			//return N;
+
+		}	
+		//##################################################################
+    // @return {Material} material of this primitive
+    this.GetMaterial = function () { return this.m_Material; }
+
+    // @param {Material} a_Mat
+    this.SetMaterial = function (a_Mat) { this.m_Material = a_Mat; }
+
+	// @param {Texture} a_Texture
+		this.SetTexture = function(a_Texture) { this.m_Texture = a_Texture; }
+}
+//#############################################################################
 //class Box
 function Box(a_Box) {
     // Intersection method return values
@@ -782,6 +989,7 @@ function Scene() {
     // init scene
     this.InitScene = function () {
         Sphere.prototype = new Primitive(); // set parent
+        Triangle.prototype = new Primitive(); // set parent
         PlanePrim.prototype = new Primitive(); // set parent
 
         this.m_Primitive = new Array(500);
@@ -857,6 +1065,24 @@ function Scene() {
                 prim++;
             }
         }
+        // Triangle 
+												 //x					y					z					nx				ny				nz				u					v
+					var tri_data = ["2.400000	2.250000	1.000000	0.902861	-0.429934	0.000000	0.000000	0.000000",
+							 					 "-1.291500	1.250000	0.549500	0.833024	-0.430810	-0.347093	0.250000	0.000000",
+													"0.273482	-0.323828	2.541834	0.918898	0.095044	-0.382874	0.250000	0.250000"];
+				//@param {float} x,y,z,scale,offset,u,v
+				var scale = 1.0,offset = 0.0;
+				//@param {Vertex} v1,v2,v3
+				var v1 = new Vertex(tri_data[0]);
+				var v2 = new Vertex(tri_data[1]);
+				var v3 = new Vertex(tri_data[2]);
+
+        this.m_Primitive[prim] = new Triangle(v1,v2,v3);
+        this.m_Primitive[prim].SetName("Triangle");
+        this.m_Primitive[prim].GetMaterial().SetReflection(0.2);
+        this.m_Primitive[prim].GetMaterial().SetRefraction(0.8);
+        this.m_Primitive[prim].GetMaterial().SetRefrIndex(1.3);
+        this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(0.7, 0.7, 1.0));
 
         this.m_Primitives = prim;
         
@@ -947,6 +1173,9 @@ function Engine()
 	//@return[2] {float} a_Dist
 	this.Raytrace = function( a_Ray, a_Depth, a_RIndex ) 
 	{							
+
+
+
 		var ret = new Array(3);											
 		if(a_Depth > TRACEDEPTH) {ret[0] = 0;return ret;}
 
@@ -977,6 +1206,10 @@ function Engine()
 		}
 
 		if (!prim) { ret[0] = 0; return ret; };
+
+		//check prim
+		//console.log("Trace Prim "+prim.toString());
+
 
 		var a_Acc = new vector3();
 		
@@ -1062,8 +1295,8 @@ function Engine()
 								a_Acc = a_Acc.Add(light.GetMaterial().GetColor().Mul(spec));
 							}
 						}
-					} // end of if
-				} // end of if
+					} // end of if shade > 0
+				} // end of if p is light
 			} // end of for loop
 		}
 		// calculate reflection
@@ -1080,7 +1313,8 @@ function Engine()
 			//var dist;
 			var ret = this.Raytrace( new Ray( pi.Add(R.Mul(EPSILON)), R ), a_Depth + 1, a_RIndex);
 			rcol = ret[1];
-			a_Acc = a_Acc.Add(prim.GetMaterial().GetColor().Mul(rcol.Mul(refl)));
+			//console.log("Rcol is "+rcol);	
+			a_Acc = a_Acc.Add(prim.GetMaterial().GetColor().Mul(rcol.Mul(refl)));//debug
 		}
 		// calculate refraction
 		//@param {float}
