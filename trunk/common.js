@@ -170,7 +170,12 @@ function vector3(x,y,z)
 	this.r = 0.0;
 	this.g = 0.0;
 	this.b = 0.0;
-	this.cell = new Array(3);
+	this.cell = function(i)
+	{
+		if(i == 0){return this.x;}
+		if(i == 1){return this.y;}
+		if(i == 2){return this.z;}
+	}
 }
 
 //#############################################################################
