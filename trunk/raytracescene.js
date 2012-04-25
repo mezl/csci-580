@@ -3,7 +3,6 @@
 // 2012 Spring CS580 Final Project 4/18/2012
 // Author: Yun-Yu Chen,Sophia Chang,Vince Liao,Chin-Kai Chang
 // -----------------------------------------------------------
-//testRaytraceScene();
 //
 //#############################################################################
 //code testing
@@ -1070,17 +1069,26 @@ function Scene() {
             }
         }
         
-        // Triangle 
-												 //x					y					z					nx				ny				nz				u					v
-					var tri_data = ["2.400000	2.250000	1.000000	0.902861	-0.429934	0.000000	0.000000	0.000000",
-							 					 "-1.291500	1.250000	0.549500	0.833024	-0.430810	-0.347093	0.250000	0.000000",
-													"0.273482	-0.323828	2.541834	0.918898	0.095044	-0.382874	0.250000	0.250000"];
-				//@param {float} x,y,z,scale,offset,u,v
-				var scale = 1.0,offset = 0.0;
-				//@param {Vertex} v1,v2,v3
-				var v1 = new Vertex(tri_data[0]);
-				var v2 = new Vertex(tri_data[1]);
-				var v3 = new Vertex(tri_data[2]);
+				if(USE_POLYGON)
+				{
+					// Triangle 
+					//x					y					z					nx				ny				nz				u					v
+					//	var tri_data = ["2.400000	2.250000	1.000000	0.902861	-0.429934	0.000000	0.000000	0.000000",
+					//			 					 "-1.291500	1.250000	0.549500	0.833024	-0.430810	-0.347093	0.250000	0.000000",
+					//									"0.273482	-0.323828	2.541834	0.918898	0.095044	-0.382874	0.250000	0.250000"];
+					//@param {float} x,y,z,scale,offset,u,v
+
+					var asc = getASC();
+					var lines = asc.split(/\r\n|\r|\n/);
+					var scale = 1.0,offset = 0.0;
+					for(var t = 0;t< lines.length;t++)			
+					{
+						var line = lines[i];
+						if(line == 'triangle'){
+							//@param {Vertex} v1,v2,v3
+							var v1 = new Vertex(lines[t+1]);
+							var v2 = new Vertex(lines[t+2]);
+							var v3 = new Vertex(lines[t+3]);
 
 							this.m_Primitive[prim] = new Triangle(v1,v2,v3);
 							this.m_Primitive[prim].SetName("Triangle");
@@ -1091,7 +1099,8 @@ function Scene() {
 							console.log("Prims is "+prim);
 						}
 					}
-				}
+				}//if USE_POLYGON
+		
 				console.log("Finish Load All prims "+prim);
         this.m_Primitives = prim;
         
@@ -1157,15 +1166,11 @@ function Ray(a_Origin, a_Direction, a_ID)
 	var m_Direction = new vector3();
 }
 
-//@param {Boolean}
-var USE_SHADOW = new Boolean(true);
-var USE_REFLECTION = new Boolean(true);
-var USE_REFRACTION = new Boolean(true);
-var USE_SPECULAR = new Boolean(true);
 
 // class Engine
 function Engine()
 {
+	console.log("Create Engine");
 	//default constructor
 	this.m_Scene = new Scene();
 	this.m_Scene.InitScene();
