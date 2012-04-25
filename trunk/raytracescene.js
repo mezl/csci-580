@@ -1148,6 +1148,12 @@ function Ray(a_Origin, a_Direction, a_ID)
 	var m_Direction = new vector3();
 }
 
+//@param {Boolean}
+var USE_SHADOW = new Boolean(false);
+var USE_REFLECTION = new Boolean(false);
+var USE_REFRACTION = new Boolean(false);
+var USE_SPECULAR = new Boolean(false);
+
 // class Engine
 function Engine()
 {
@@ -1235,25 +1241,29 @@ function Engine()
 					// handle point light source
 					//@param {float}
 					var shade = 1.0;
-					if (light.GetType() == 1) // SPHERE
+					
+					if (USE_SHADOW.valueOf())
 					{
-						//@param {vector3}
-						var L = light.GetCentre().Sub(pi);
-						//@param {float}
-						var tdist = LENGTH( L );
-						L = L.Mul( 1.0 / tdist );
-						//@param {Ray}
-						var r = new Ray( pi.Add(L.Mul(EPSILON)), L );
-						for ( var s = 0; s < this.m_Scene.GetNrPrimitives(); s++ )
+						if (light.GetType() == 1) // SPHERE
 						{
-							//@param {Primitive}
-							var pr = this.m_Scene.GetPrimitive( s );
-							var ret1 = pr.Intersect(r, tdist);
-
-							if((pr != light) && (ret1[0]))
+							//@param {vector3}
+							var L = light.GetCentre().Sub(pi);
+							//@param {float}
+							var tdist = LENGTH( L );
+							L = L.Mul( 1.0 / tdist );
+							//@param {Ray}
+							var r = new Ray( pi.Add(L.Mul(EPSILON)), L );
+							for ( var s = 0; s < this.m_Scene.GetNrPrimitives(); s++ )
 							{
-								shade = 0;
-								break;
+								//@param {Primitive}
+								var pr = this.m_Scene.GetPrimitive( s );
+								var ret1 = pr.Intersect(r, tdist);
+	
+								if((pr != light) && (ret1[0]))
+								{
+									shade = 0;
+									break;
+								}
 							}
 						}
 					}
@@ -1278,21 +1288,24 @@ function Engine()
 							}
 						}
 						
-						// determine specular component
-						if(prim.GetMaterial().GetSpecular() > 0)
+						if(USE_SPECULAR.valueOf())
 						{
-							// @param {vector3}
-							var V = a_Ray.GetDirection();
-							// @param {vector3}
-							var R = L.Sub(N.Mul(2.0 * DOT(L, N)));
-							R.Normalize();
-							// @param {float}
-							var dot = DOT(V, R);
-							if(dot > 0)
+							// determine specular component
+							if(prim.GetMaterial().GetSpecular() > 0)
 							{
+								// @param {vector3}
+								var V = a_Ray.GetDirection();
+								// @param {vector3}
+								var R = L.Sub(N.Mul(2.0 * DOT(L, N)));
+								R.Normalize();
 								// @param {float}
-								var spec = Math.pow( dot, 20) * prim.GetMaterial().GetSpecular() * shade;
-								a_Acc = a_Acc.Add(light.GetMaterial().GetColor().Mul(spec));
+								var dot = DOT(V, R);
+								if(dot > 0)
+								{
+									// @param {float}
+									var spec = Math.pow( dot, 20) * prim.GetMaterial().GetSpecular() * shade;
+									a_Acc = a_Acc.Add(light.GetMaterial().GetColor().Mul(spec));
+								}
 							}
 						}
 					} // end of if shade > 0
@@ -1300,51 +1313,57 @@ function Engine()
 			} // end of for loop
 		}
 		// calculate reflection
-		//@param {float}
-		var refl = prim.GetMaterial().GetReflection();
-			
-		if ((refl > 0.0) && (a_Depth < TRACEDEPTH))
-		{
-			//@param {vector3}
-			var N = prim.GetNormal( pi );
-			var R = a_Ray.GetDirection().Sub(N.Mul(2.0 * DOT(a_Ray.GetDirection(), N)));
-			var rcol = new vector3( 0, 0, 0 );
-			//@param {float}
-			//var dist;
-			var ret = this.Raytrace( new Ray( pi.Add(R.Mul(EPSILON)), R ), a_Depth + 1, a_RIndex);
-			rcol = ret[1];
-			//console.log("Rcol is "+rcol);	
-			a_Acc = a_Acc.Add(prim.GetMaterial().GetColor().Mul(rcol.Mul(refl)));//debug
-		}
-		// calculate refraction
-		//@param {float}
-		var refr = prim.GetMaterial().GetRefraction();
-		if ((refr > 0) && (a_Depth < TRACEDEPTH))
+		if(USE_REFLECTION.valueOf())
 		{
 			//@param {float}
-			var rindex = prim.GetMaterial().GetRefrIndex();
-			var n = a_RIndex / rindex;
-			//@param {vector3}
-			var N = prim.GetNormal( pi ).Mul(result);
-			//@param {float}
-			var cosI = -DOT( N, a_Ray.GetDirection() );
-			var cosT2 = 1.0 - n * n * (1.0 - cosI * cosI);
-			
-			if (cosT2 > 0.0)
+			var refl = prim.GetMaterial().GetReflection();
+				
+			if ((refl > 0.0) && (a_Depth < TRACEDEPTH))
 			{
 				//@param {vector3}
-				var T = (a_Ray.GetDirection().Mul(n)).Add(N.Mul(n * cosI - Math.sqrt( cosT2 )));
+				var N = prim.GetNormal( pi );
+				var R = a_Ray.GetDirection().Sub(N.Mul(2.0 * DOT(a_Ray.GetDirection(), N)));
 				var rcol = new vector3( 0, 0, 0 );
 				//@param {float}
-				var dist;
-				var ret = this.Raytrace( new Ray( pi.Add(T.Mul(EPSILON)), T ), a_Depth + 1, rindex);
+				//var dist;
+				var ret = this.Raytrace( new Ray( pi.Add(R.Mul(EPSILON)), R ), a_Depth + 1, a_RIndex);
 				rcol = ret[1];
-				dist = ret[2];
-				// apply Beer's law
-				// @param {vector3}
-				var absorbance = (prim.GetMaterial().GetColor().Mul(0.15)).Mul(-dist);
-				var transparancy = new vector3(Math.exp(absorbance.x), Math.exp(absorbance.y), Math.exp(absorbance.z));
-				a_Acc = a_Acc.Add(rcol.Mul(transparancy));
+				//console.log("Rcol is "+rcol);	
+				a_Acc = a_Acc.Add(prim.GetMaterial().GetColor().Mul(rcol.Mul(refl)));//debug
+			}
+		}
+		// calculate refraction
+		if(USE_REFRACTION.valueOf())
+		{
+			//@param {float}
+			var refr = prim.GetMaterial().GetRefraction();
+			if ((refr > 0) && (a_Depth < TRACEDEPTH))
+			{
+				//@param {float}
+				var rindex = prim.GetMaterial().GetRefrIndex();
+				var n = a_RIndex / rindex;
+				//@param {vector3}
+				var N = prim.GetNormal( pi ).Mul(result);
+				//@param {float}
+				var cosI = -DOT( N, a_Ray.GetDirection() );
+				var cosT2 = 1.0 - n * n * (1.0 - cosI * cosI);
+				
+				if (cosT2 > 0.0)
+				{
+					//@param {vector3}
+					var T = (a_Ray.GetDirection().Mul(n)).Add(N.Mul(n * cosI - Math.sqrt( cosT2 )));
+					var rcol = new vector3( 0, 0, 0 );
+					//@param {float}
+					var dist;
+					var ret = this.Raytrace( new Ray( pi.Add(T.Mul(EPSILON)), T ), a_Depth + 1, rindex);
+					rcol = ret[1];
+					dist = ret[2];
+					// apply Beer's law
+					// @param {vector3}
+					var absorbance = (prim.GetMaterial().GetColor().Mul(0.15)).Mul(-dist);
+					var transparancy = new vector3(Math.exp(absorbance.x), Math.exp(absorbance.y), Math.exp(absorbance.z));
+					a_Acc = a_Acc.Add(rcol.Mul(transparancy));
+				}
 			}
 		}
 		//console.log("Color in Raytrace "+a_Acc.toString());
