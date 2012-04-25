@@ -19,7 +19,8 @@ var USE_SPECULAR = false;
 var USE_POLYGON = false;
 //#############################################################################
 initMain();
-  animate();
+animate();
+//testRaytraceScene();
 function toggleShadow(chkbox) { 
     USE_SHADOW = (chkbox.checked);
     cancelRequestAnimFrame(animateRequest);
