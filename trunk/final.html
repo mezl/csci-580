@@ -3,16 +3,18 @@
   <head>
     <title>CS580 Final Project by Yun-Yu Chen,Sophia Chang,Vince Liao,Chin-Kai Chang</title>
 	<style type="text/css">canvas{background: #000000;}</style>
-		<input type="checkbox" name="texture" onclick="toggleTexture(this)" checked="checked"/>option1
-		<input type="checkbox" name="persp" onclick="togglePersp(this)" checked="checked"/>option2
-		<input type="checkbox" name="shading" onclick="toggleShading(this)" />option3
-		<input type="checkbox" name="noise" onclick="toggleNoise(this)" />option3
+		<input type="checkbox" name="Shadow" onclick="toggleShadow(this)" />Shadow
+		<input type="checkbox" name="Reflection" onclick="toggleReflection(this)" />Reflection
+		<input type="checkbox" name="Refraction" onclick="toggleRefraction(this)" />Refraction
+		<input type="checkbox" name="Specular" onclick="toggleSpecular(this)" />Specular
+		<input type="checkbox" name="Polygon" onclick="togglePolygon(this)" />Polygon
 		</BR>
   </head>
   <body>
-    <canvas id="simpleCanvas" width="400" height="300"></canvas>
+    <canvas id="simpleCanvas" width="200" height="160"></canvas>
   </body>
     <script type="text/javascript" src="common.js"></script>
+    <script type="text/javascript" src="ppot.js"></script>
     <script type="text/javascript" src="raytracescene.js"></script>
     <script type="text/javascript" src="main.js"></script>
 </html>
