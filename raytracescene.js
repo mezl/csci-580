@@ -575,18 +575,19 @@ function PlanePrim(a_Normal, a_D) {
 
 //#############################################################################
 //class Vertex
-function Vertex(a_Pos,a_U,a_V)
+function Vertex(a_Pos,a_U,a_V,scale,offset)
 {
 	//constructor Vertex(String)
 	//2.400000	2.250000	1.000000	0.902861	-0.429934	0.000000	0.000000	0.000000
 	//[0]x			[1]y			[2]z			[3]nx			[4]ny			[5]nz			[6]u			[7]v								
-	if (typeof (a_U) == "undefined") 
+	if (typeof (scale) != "undefined") 
 	{
 			//array of number
 			var s = a_Pos.split("	");			
 		
 			//@param {vector3} pos
-			var pos =    new vector3(s[0],s[1],s[2]);
+			var pos =    new vector3((s[0]*scale)+offset,(s[1]*scale)+offset,(s[2]*scale)+offset);
+			//var normal = new vector3((s[3]*scale)+offset,(s[4]*scale)+offset,(s[5]*scale)+offset);
 			var normal = new vector3(s[3],s[4],s[5]);
 			//@param {float} u,v
 			var u = s[6]; var v = s[7];
@@ -685,7 +686,7 @@ function Triangle(v1,v2,v3)
 		this.cnv = -(cc.cell(u) * reci );
 		this.m_N.Normalize();
 
-		console.log("Triangle's Normal is "+this.m_N.toString());
+		//console.log("Triangle's Normal is "+this.m_N.toString());
 	
 		
 
@@ -1081,13 +1082,17 @@ function Scene() {
 				var v2 = new Vertex(tri_data[1]);
 				var v3 = new Vertex(tri_data[2]);
 
-        this.m_Primitive[prim] = new Triangle(v1,v2,v3);
-        this.m_Primitive[prim].SetName("Triangle");
-        this.m_Primitive[prim].GetMaterial().SetReflection(0.2);
-        this.m_Primitive[prim].GetMaterial().SetRefraction(0.8);
-        this.m_Primitive[prim].GetMaterial().SetRefrIndex(1.3);
-        this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(0.7, 0.7, 1.0));
-
+							this.m_Primitive[prim] = new Triangle(v1,v2,v3);
+							this.m_Primitive[prim].SetName("Triangle");
+							this.m_Primitive[prim].GetMaterial().SetReflection(0.2);
+							this.m_Primitive[prim].GetMaterial().SetRefraction(0.8);
+							this.m_Primitive[prim].GetMaterial().SetRefrIndex(1.3);
+							this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(0.7, 0.7, 1.0));
+							console.log("Prims is "+prim);
+						}
+					}
+				}
+				console.log("Finish Load All prims "+prim);
         this.m_Primitives = prim;
         
         /*
@@ -1244,7 +1249,7 @@ function Engine()
 					//@param {float}
 					var shade = 1.0;
 					
-					if (USE_SHADOW.valueOf())
+					if (USE_SHADOW)
 					{
 						if (light.GetType() == 1) // SPHERE
 						{
@@ -1290,7 +1295,7 @@ function Engine()
 							}
 						}
 						
-						if(USE_SPECULAR.valueOf())
+						if(USE_SPECULAR)
 						{
 							// determine specular component
 							if(prim.GetMaterial().GetSpecular() > 0)
@@ -1315,7 +1320,7 @@ function Engine()
 			} // end of for loop
 		}
 		// calculate reflection
-		if(USE_REFLECTION.valueOf())
+		if(USE_REFLECTION)
 		{
 			//@param {float}
 			var refl = prim.GetMaterial().GetReflection();
@@ -1334,7 +1339,7 @@ function Engine()
 			}
 		}
 		// calculate refraction
-		if(USE_REFRACTION.valueOf())
+		if(USE_REFRACTION)
 		{
 			//@param {float}
 			var refr = prim.GetMaterial().GetRefraction();
