@@ -1007,7 +1007,7 @@ function Scene() {
         
         // big sphere
         //this.m_Primitive[1] = new Sphere(new vector3(2, 0.8, 3), 2.5);
-        this.m_Primitive[prim] = new Sphere(new vector3(0.5, 0, 3), 1.5);
+        this.m_Primitive[prim] = new Sphere(new vector3(3.5, 0, 3), 1.5);
         this.m_Primitive[prim].SetName("center sphere");
         this.m_Primitive[prim].GetMaterial().SetReflection(0.2);
         this.m_Primitive[prim].GetMaterial().SetRefraction(0.2);
@@ -1043,8 +1043,8 @@ function Scene() {
 				}
         // extra sphere
         //this.m_Primitive[5] = new Sphere(new vector3(-2, -3.8, 1), 1.5);
-        this.m_Primitive[prim] = new Sphere(new vector3(3, 4, 5),4.5);
-        this.m_Primitive[prim].SetName("right sphere");
+        this.m_Primitive[prim] = new Sphere(new vector3(-2, -2, 8),3.5);
+        this.m_Primitive[prim].SetName("right sphere");//big center ball
         this.m_Primitive[prim].GetMaterial().SetReflection(0.2);
         this.m_Primitive[prim].GetMaterial().SetRefraction(0.8);
         this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(1.0, 0.4, 0.4));
