@@ -1078,7 +1078,7 @@ function Scene() {
 							this.m_Primitive[prim].GetMaterial().SetRefraction(0);
 							this.m_Primitive[prim].GetMaterial().SetSpecular(0.6);
 							this.m_Primitive[prim].GetMaterial().SetDiffuse(0.6);
-							this.m_Primitive[prim].GetMaterial().SetColor(new vector3(0.8,0.8, 0.9));
+							this.m_Primitive[prim].GetMaterial().SetColor(new vector3(0.2+Rand(0.6),0.2+Rand(0.6), 0.6+Rand(0.4)));
 							prim++;
 						}
 					}
