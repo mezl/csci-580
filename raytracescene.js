@@ -1007,11 +1007,13 @@ function Scene() {
         
         // big sphere
         //this.m_Primitive[1] = new Sphere(new vector3(2, 0.8, 3), 2.5);
-        this.m_Primitive[prim] = new Sphere(new vector3(3.5, 0, 3), 1.5);
+        this.m_Primitive[prim] = new Sphere(new vector3(0.5, 0, 3), 1.5);
         this.m_Primitive[prim].SetName("center sphere");
         this.m_Primitive[prim].GetMaterial().SetReflection(0.2);
-        this.m_Primitive[prim].GetMaterial().SetRefraction(0.2);
+        this.m_Primitive[prim].GetMaterial().SetRefraction(0.);
         this.m_Primitive[prim].GetMaterial().SetRefrIndex(1.5);
+ 		this.m_Primitive[prim].GetMaterial().SetDiffuse(0.6);
+		this.m_Primitive[prim].GetMaterial().SetSpecular(0.3);
         this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(0.3, 0.7, 0.7));
 //		this.m_Primitive[1].GetMaterial().SetTexture(new Texture( "textures/marble.tga" ));
         // small sphere
@@ -1022,6 +1024,7 @@ function Scene() {
         this.m_Primitive[prim].GetMaterial().SetRefraction(0.2);
         this.m_Primitive[prim].GetMaterial().SetRefrIndex(1.1);
         this.m_Primitive[prim].GetMaterial().SetDiffuse(0.1);
+		this.m_Primitive[prim].GetMaterial().SetSpecular(0.3);
         this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(0.7, 0.7, 1.0));
 //		this.m_Primitive[2].GetMaterial().SetTexture(new Texture( "textures/marble.tga" ));
         // light source 1
@@ -1048,11 +1051,13 @@ function Scene() {
 				}
         // extra sphere
         //this.m_Primitive[5] = new Sphere(new vector3(-2, -3.8, 1), 1.5);
+        this.m_Primitive[prim] = new Sphere(new vector3(3, 4, 5),4.5);
+        this.m_Primitive[prim].SetName("right sphere");
         this.m_Primitive[prim] = new Sphere(new vector3(-2, 1, 8.2),4.2);
         this.m_Primitive[prim].SetName("right sphere");//big center ball
         this.m_Primitive[prim].GetMaterial().SetReflection(0.2);
         this.m_Primitive[prim].GetMaterial().SetRefraction(0.8);
-        this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(1.0, 0.4, 0.4));
+        this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(0.7, 0.7, 1.0));
         // back plane
         this.m_Primitive[prim] = new PlanePrim(new vector3(-0.5, 0.7, -1), 12);
         this.m_Primitive[prim].SetName("back plane");
@@ -1078,9 +1083,9 @@ function Scene() {
         this.m_Primitive[prim].GetMaterial().SetReflection(0.3);
         this.m_Primitive[prim].GetMaterial().SetRefraction(0.8);
         this.m_Primitive[prim].GetMaterial().SetSpecular(0.1);
-        this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(1.0, 0.4, 0.4));
-        
-        
+		this.m_Primitive[prim].GetMaterial().SetDiffuse(0.6);
+        this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(1.0, 0.7, 0.7));
+                
         //grid
         //var prim = 9;
 				if(USE_GRID_SPHERE)
@@ -1132,6 +1137,7 @@ function Scene() {
 					}
 				}//if USE_POLYGON
 		
+
 				console.log("Finish Load All prims "+prim);
         this.m_Primitives = prim;
         
