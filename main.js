@@ -16,6 +16,7 @@ var USE_SHADOW = false;
 var USE_REFLECTION = false;
 var USE_REFRACTION = false;
 var USE_SPECULAR = false;
+var USE_GRID_SPHERE = false;
 var USE_POLYGON = false;
 //#############################################################################
 initMain();
@@ -39,6 +40,13 @@ function toggleRefraction(chkbox) {
 function toggleSpecular(chkbox) { 
     USE_SPECULAR= (chkbox.checked);
     cancelRequestAnimFrame(animateRequest);
+		redraw();
+}
+function toggleGridSphere(chkbox) { 
+    USE_GRID_SPHERE = (chkbox.checked);
+    cancelRequestAnimFrame(animateRequest);
+		Engine.m_Scene = new Scene();
+		Engine.m_Scene.InitScene();
 		redraw();
 }
 function togglePolygon(chkbox) { 

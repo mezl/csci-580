@@ -1068,19 +1068,21 @@ function Scene() {
         
         //grid
         var prim = 9;
-        for (x = 0; x < 10; x++) {
-            for (y = 0; y < 3; y++) {
-                this.m_Primitive[prim] = new Sphere(new vector3(-10 + x * 1.5,  y * 1.5, 10), 0.3);
-                this.m_Primitive[prim].SetName("grid sphere");
-                this.m_Primitive[prim].GetMaterial().SetReflection(0);
-                this.m_Primitive[prim].GetMaterial().SetRefraction(0);
-                this.m_Primitive[prim].GetMaterial().SetSpecular(0.6);
-                this.m_Primitive[prim].GetMaterial().SetDiffuse(0.6);
-                this.m_Primitive[prim].GetMaterial().SetColor(new vector3(0.8,0.8, 0.9));
-                prim++;
-            }
-        }
-        
+				if(USE_GRID_SPHERE)
+				{
+					for (x = 0; x < 10; x++) {
+						for (y = 0; y < 3; y++) {
+							this.m_Primitive[prim] = new Sphere(new vector3(-10 + x * 1.5,  y * 1.5, 10), 0.3);
+							this.m_Primitive[prim].SetName("grid sphere");
+							this.m_Primitive[prim].GetMaterial().SetReflection(0);
+							this.m_Primitive[prim].GetMaterial().SetRefraction(0);
+							this.m_Primitive[prim].GetMaterial().SetSpecular(0.6);
+							this.m_Primitive[prim].GetMaterial().SetDiffuse(0.6);
+							this.m_Primitive[prim].GetMaterial().SetColor(new vector3(0.8,0.8, 0.9));
+							prim++;
+						}
+					}
+				}
 				
 				if(USE_POLYGON)
 				{
