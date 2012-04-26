@@ -1069,6 +1069,7 @@ function Scene() {
             }
         }
         
+				
 				if(USE_POLYGON)
 				{
 					// Triangle 
@@ -1081,14 +1082,15 @@ function Scene() {
 					var asc = getASC();
 					var lines = asc.split(/\r\n|\r|\n/);
 					var scale = 1.0,offset = 0.0;
+					//console.log("Total line of polygon is "+lines.length);
 					for(var t = 0;t< lines.length;t++)			
 					{
-						var line = lines[i];
+						var line = lines[t];
 						if(line == 'triangle'){
 							//@param {Vertex} v1,v2,v3
-							var v1 = new Vertex(lines[t+1]);
-							var v2 = new Vertex(lines[t+2]);
-							var v3 = new Vertex(lines[t+3]);
+							var v1 = new Vertex(lines[t+1],0,0,scale,offset);
+							var v2 = new Vertex(lines[t+2],0,0,scale,offset);
+							var v3 = new Vertex(lines[t+3],0,0,scale,offset);
 
 							this.m_Primitive[prim] = new Triangle(v1,v2,v3);
 							this.m_Primitive[prim].SetName("Triangle");
@@ -1096,7 +1098,7 @@ function Scene() {
 							this.m_Primitive[prim].GetMaterial().SetRefraction(0.8);
 							this.m_Primitive[prim].GetMaterial().SetRefrIndex(1.3);
 							this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(0.7, 0.7, 1.0));
-							console.log("Prims is "+prim);
+							//console.log("Prims is "+prim);
 						}
 					}
 				}//if USE_POLYGON

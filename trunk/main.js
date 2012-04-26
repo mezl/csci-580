@@ -44,6 +44,8 @@ function toggleSpecular(chkbox) {
 function togglePolygon(chkbox) { 
     USE_POLYGON = (chkbox.checked);
     cancelRequestAnimFrame(animateRequest);
+		Engine.m_Scene = new Scene();
+		Engine.m_Scene.InitScene();
 		redraw();
 }
 function initMain()
