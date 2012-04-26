@@ -1025,13 +1025,22 @@ function Scene() {
         this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(0.7, 0.7, 1.0));
 //		this.m_Primitive[2].GetMaterial().SetTexture(new Texture( "textures/marble.tga" ));
         // light source 1
-        this.m_Primitive[prim] = new Sphere(new vector3(0, 5, 5), 0.1);
-        this.m_Primitive[prim].Light(new Boolean(true));
-        this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(0.4, 0.4, 0.4));
+				if(USE_L1){
+        	this.m_Primitive[prim] = new Sphere(new vector3(0, 5, 5), 0.1);
+        	this.m_Primitive[prim].Light(new Boolean(true));
+        	this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(0.4, 0.4, 0.4));
+				}
         // light source 2
-        this.m_Primitive[prim] = new Sphere(new vector3(-3, 5, 1), 0.1);
-        this.m_Primitive[prim].Light(new Boolean(true));
-        this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(0.6, 0.6, 0.8));
+				if(USE_L2){
+					this.m_Primitive[prim] = new Sphere(new vector3(-3, 5, 1), 0.1);
+					this.m_Primitive[prim].Light(new Boolean(true));
+					this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(0.6, 0.6, 0.8));
+				}
+				if(USE_L3){
+					this.m_Primitive[prim] = new Sphere(new vector3(5, 0, 1), 0.1);
+					this.m_Primitive[prim].Light(new Boolean(true));
+					this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(0.8, 0.2, 0.1));
+				}
         // extra sphere
         //this.m_Primitive[5] = new Sphere(new vector3(-2, -3.8, 1), 1.5);
         this.m_Primitive[prim] = new Sphere(new vector3(3, 4, 5),4.5);

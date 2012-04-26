@@ -18,6 +18,9 @@ var USE_REFRACTION = false;
 var USE_SPECULAR = false;
 var USE_GRID_SPHERE = false;
 var USE_POLYGON = false;
+var USE_L1 = true;
+var USE_L2 = false;
+var USE_L3 = false;
 //#############################################################################
 initMain();
 animate();
@@ -56,6 +59,30 @@ function togglePolygon(chkbox) {
 		Engine.m_Scene.InitScene();
 		redraw();
 }
+function toggleL1(chkbox) { 
+    USE_L1= (chkbox.checked);
+    cancelRequestAnimFrame(animateRequest);
+		Engine.m_Scene = new Scene();
+		Engine.m_Scene.InitScene();
+		redraw();
+}
+function toggleL2(chkbox) { 
+    USE_L2= (chkbox.checked);
+    cancelRequestAnimFrame(animateRequest);
+		Engine.m_Scene = new Scene();
+		Engine.m_Scene.InitScene();
+		redraw();
+}
+function toggleL3(chkbox) { 
+    USE_L3= (chkbox.checked);
+    cancelRequestAnimFrame(animateRequest);
+		Engine.m_Scene = new Scene();
+		Engine.m_Scene.InitScene();
+		redraw();
+}
+
+
+
 function initMain()
 {
 	// Load the context of the canvas
