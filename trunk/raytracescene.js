@@ -1041,9 +1041,14 @@ function Scene() {
 					this.m_Primitive[prim].Light(new Boolean(true));
 					this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(0.8, 0.2, 0.1));
 				}
+				if(USE_L4){
+					this.m_Primitive[prim] = new Sphere(new vector3(-6, 0, 1), 1.0);
+					this.m_Primitive[prim].Light(new Boolean(true));
+					this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(0.2, 0.7, 0.2));
+				}
         // extra sphere
         //this.m_Primitive[5] = new Sphere(new vector3(-2, -3.8, 1), 1.5);
-        this.m_Primitive[prim] = new Sphere(new vector3(-2, -2, 8),3.5);
+        this.m_Primitive[prim] = new Sphere(new vector3(-2, 1, 8.2),4.2);
         this.m_Primitive[prim].SetName("right sphere");//big center ball
         this.m_Primitive[prim].GetMaterial().SetReflection(0.2);
         this.m_Primitive[prim].GetMaterial().SetRefraction(0.8);

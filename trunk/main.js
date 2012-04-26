@@ -15,12 +15,13 @@ var totalTime = 0;
 var USE_SHADOW = false;
 var USE_REFLECTION = false;
 var USE_REFRACTION = false;
-var USE_SPECULAR = false;
+var USE_SPECULAR = true;
 var USE_GRID_SPHERE = false;
 var USE_POLYGON = false;
 var USE_L1 = true;
 var USE_L2 = false;
 var USE_L3 = false;
+var USE_L4 = true;
 //#############################################################################
 initMain();
 animate();
