@@ -994,80 +994,81 @@ function Scene() {
 
         this.m_Primitive = new Array(500);
         
+        var prim = 0;
         // ground plane
-        this.m_Primitive[0] = new PlanePrim(new vector3(0, 1, 0), 4.4);
-        this.m_Primitive[0].prototype = new Primitive();
-        this.m_Primitive[0].SetName("plane");
-        this.m_Primitive[0].GetMaterial().SetReflection(0);
-        this.m_Primitive[0].GetMaterial().SetRefraction(0);
-        this.m_Primitive[0].GetMaterial().SetDiffuse(1);
-        this.m_Primitive[0].GetMaterial().SetColor(new vector3(0.3, 0.4, 0.4));
+        this.m_Primitive[prim] = new PlanePrim(new vector3(0, 1, 0), 4.4);
+        this.m_Primitive[prim].prototype = new Primitive();
+        this.m_Primitive[prim].SetName("plane");
+        this.m_Primitive[prim].GetMaterial().SetReflection(0);
+        this.m_Primitive[prim].GetMaterial().SetRefraction(0);
+        this.m_Primitive[prim].GetMaterial().SetDiffuse(1);
+        this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(0.3, 0.4, 0.4));
 //		this.m_Primitive[0].GetMaterial().SetTexture(new Texture( "textures/wood.tga" ));
         
         // big sphere
         //this.m_Primitive[1] = new Sphere(new vector3(2, 0.8, 3), 2.5);
-        this.m_Primitive[1] = new Sphere(new vector3(0.5, 0, 3), 1.5);
-        this.m_Primitive[1].SetName("center sphere");
-        this.m_Primitive[1].GetMaterial().SetReflection(0.2);
-        this.m_Primitive[1].GetMaterial().SetRefraction(0.2);
-        this.m_Primitive[1].GetMaterial().SetRefrIndex(1.5);
-        this.m_Primitive[1].GetMaterial().SetColor(new vector3(0.3, 0.7, 0.7));
+        this.m_Primitive[prim] = new Sphere(new vector3(0.5, 0, 3), 1.5);
+        this.m_Primitive[prim].SetName("center sphere");
+        this.m_Primitive[prim].GetMaterial().SetReflection(0.2);
+        this.m_Primitive[prim].GetMaterial().SetRefraction(0.2);
+        this.m_Primitive[prim].GetMaterial().SetRefrIndex(1.5);
+        this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(0.3, 0.7, 0.7));
 //		this.m_Primitive[1].GetMaterial().SetTexture(new Texture( "textures/marble.tga" ));
         // small sphere
         //this.m_Primitive[2] = new Sphere(new vector3(-5.5, -0.5, 7), 2);
-        this.m_Primitive[2] = new Sphere(new vector3(-5, 0, 4), 1.5);
-        this.m_Primitive[2].SetName("left sphere");
-        this.m_Primitive[2].GetMaterial().SetReflection(0.5);
-        this.m_Primitive[2].GetMaterial().SetRefraction(0.2);
-        this.m_Primitive[2].GetMaterial().SetRefrIndex(1.1);
-        this.m_Primitive[2].GetMaterial().SetDiffuse(0.1);
-        this.m_Primitive[2].GetMaterial().SetColor(new vector3(0.7, 0.7, 1.0));
+        this.m_Primitive[prim] = new Sphere(new vector3(-5, 0, 4), 1.5);
+        this.m_Primitive[prim].SetName("left sphere");
+        this.m_Primitive[prim].GetMaterial().SetReflection(0.5);
+        this.m_Primitive[prim].GetMaterial().SetRefraction(0.2);
+        this.m_Primitive[prim].GetMaterial().SetRefrIndex(1.1);
+        this.m_Primitive[prim].GetMaterial().SetDiffuse(0.1);
+        this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(0.7, 0.7, 1.0));
 //		this.m_Primitive[2].GetMaterial().SetTexture(new Texture( "textures/marble.tga" ));
         // light source 1
-        this.m_Primitive[3] = new Sphere(new vector3(0, 5, 5), 0.1);
-        this.m_Primitive[3].Light(new Boolean(true));
-        this.m_Primitive[3].GetMaterial().SetColor(new vector3(0.4, 0.4, 0.4));
+        this.m_Primitive[prim] = new Sphere(new vector3(0, 5, 5), 0.1);
+        this.m_Primitive[prim].Light(new Boolean(true));
+        this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(0.4, 0.4, 0.4));
         // light source 2
-        this.m_Primitive[4] = new Sphere(new vector3(-3, 5, 1), 0.1);
-        this.m_Primitive[4].Light(new Boolean(true));
-        this.m_Primitive[4].GetMaterial().SetColor(new vector3(0.6, 0.6, 0.8));
+        this.m_Primitive[prim] = new Sphere(new vector3(-3, 5, 1), 0.1);
+        this.m_Primitive[prim].Light(new Boolean(true));
+        this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(0.6, 0.6, 0.8));
         // extra sphere
         //this.m_Primitive[5] = new Sphere(new vector3(-2, -3.8, 1), 1.5);
-        this.m_Primitive[5] = new Sphere(new vector3(3, 4, 5),4.5);
-        this.m_Primitive[5].SetName("right sphere");
-        this.m_Primitive[5].GetMaterial().SetReflection(0.2);
-        this.m_Primitive[5].GetMaterial().SetRefraction(0.8);
-        this.m_Primitive[5].GetMaterial().SetColor(new vector3(1.0, 0.4, 0.4));
+        this.m_Primitive[prim] = new Sphere(new vector3(3, 4, 5),4.5);
+        this.m_Primitive[prim].SetName("right sphere");
+        this.m_Primitive[prim].GetMaterial().SetReflection(0.2);
+        this.m_Primitive[prim].GetMaterial().SetRefraction(0.8);
+        this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(1.0, 0.4, 0.4));
         // back plane
-        this.m_Primitive[6] = new PlanePrim(new vector3(-0.5, 0.7, -1), 12);
-        this.m_Primitive[6].SetName("back plane");
-        this.m_Primitive[6].GetMaterial().SetReflection(0);
-        this.m_Primitive[6].GetMaterial().SetRefraction(0);
-        this.m_Primitive[6].GetMaterial().SetSpecular(0);
-        this.m_Primitive[6].GetMaterial().SetDiffuse(0.6);
-        this.m_Primitive[6].GetMaterial().SetColor(new vector3(0.2, 0.7, 0.7));
+        this.m_Primitive[prim] = new PlanePrim(new vector3(-0.5, 0.7, -1), 12);
+        this.m_Primitive[prim].SetName("back plane");
+        this.m_Primitive[prim].GetMaterial().SetReflection(0);
+        this.m_Primitive[prim].GetMaterial().SetRefraction(0);
+        this.m_Primitive[prim].GetMaterial().SetSpecular(0);
+        this.m_Primitive[prim].GetMaterial().SetDiffuse(0.6);
+        this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(0.2, 0.7, 0.7));
 //		this.m_Primitive[6].GetMaterial().SetTexture(new Texture( "textures/wood.tga" ));
         // ceiling plane
-        this.m_Primitive[7] = new PlanePrim(new vector3(0, -1, 0), 7.4);
-        this.m_Primitive[7].SetName("back plane");
-        this.m_Primitive[7].GetMaterial().SetReflection(0);
-        this.m_Primitive[7].GetMaterial().SetRefraction(0);
-        this.m_Primitive[7].GetMaterial().SetSpecular(0);
-        this.m_Primitive[7].GetMaterial().SetDiffuse(0.5);
-        this.m_Primitive[7].GetMaterial().SetColor(new vector3(0.4, 0.7, 0.7));
+        this.m_Primitive[prim] = new PlanePrim(new vector3(0, -1, 0), 7.4);
+        this.m_Primitive[prim].SetName("back plane");
+        this.m_Primitive[prim].GetMaterial().SetReflection(0);
+        this.m_Primitive[prim].GetMaterial().SetRefraction(0);
+        this.m_Primitive[prim].GetMaterial().SetSpecular(0);
+        this.m_Primitive[prim].GetMaterial().SetDiffuse(0.5);
+        this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(0.4, 0.7, 0.7));
 //		this.m_Primitive[7].GetMaterial().SetTexture(new Texture( "textures/wood.tga" ));
         
         // extra sphere
-        this.m_Primitive[8] = new Sphere(new vector3(-1.5, -4, 1),2);
-        this.m_Primitive[8].SetName("right sphere");
-        this.m_Primitive[8].GetMaterial().SetReflection(0.3);
-        this.m_Primitive[8].GetMaterial().SetRefraction(0.8);
-        this.m_Primitive[6].GetMaterial().SetSpecular(0.1);
-        this.m_Primitive[8].GetMaterial().SetColor(new vector3(1.0, 0.4, 0.4));
+        this.m_Primitive[prim] = new Sphere(new vector3(-1.5, -4, 1),2);
+        this.m_Primitive[prim].SetName("right sphere");
+        this.m_Primitive[prim].GetMaterial().SetReflection(0.3);
+        this.m_Primitive[prim].GetMaterial().SetRefraction(0.8);
+        this.m_Primitive[prim].GetMaterial().SetSpecular(0.1);
+        this.m_Primitive[prim++].GetMaterial().SetColor(new vector3(1.0, 0.4, 0.4));
         
         
         //grid
-        var prim = 9;
+        //var prim = 9;
 				if(USE_GRID_SPHERE)
 				{
 					for (x = 0; x < 10; x++) {
